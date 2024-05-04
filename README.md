@@ -7,6 +7,6 @@ npm i
 ```
 
 ```
-npx start
+npx expo
 ```
 
