@@ -1,40 +1,37 @@
 import React from "react";
-import { View, Text, TextInput, TouchableOpacity } from "react-native";
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  Image,
+  StyleSheet,
+} from "react-native";
+
+// Import your image from the assets folder
+import ScansavvyLogo from "../assets/image/scansavvyTrans.jpg";
 
 export default function Login() {
   return (
-    <View style={{ flex: 1, justifyContent: "center", padding: 20 }}>
-      <Text style={{ fontSize: 24, marginBottom: 20, color: "orange" }}>
-        scansavvy technology
-      </Text>
+    <View style={styles.container}>
+      <View style={styles.logoContainer}>
+        {/* Replace the text with the image */}
+        <Image source={ScansavvyLogo} style={styles.logo} />
+      </View>
+
       <Text style={{ fontSize: 18, marginBottom: 10 }}>
         Sign in to your account
       </Text>
 
-      <TextInput
-        style={{
-          height: 40,
-          borderColor: "gray",
-          borderWidth: 1,
-          marginBottom: 10,
-        }}
-        placeholder="Your Email"
-      />
+      <TextInput style={styles.input} placeholder="Your Email" />
 
       <TextInput
-        style={{
-          height: 40,
-          borderColor: "gray",
-          borderWidth: 1,
-          marginBottom: 20,
-        }}
+        style={styles.input}
         placeholder="Password"
         secureTextEntry={true}
       />
 
-      <TouchableOpacity
-        style={{ backgroundColor: "orange", padding: 10, alignItems: "center" }}
-      >
+      <TouchableOpacity style={styles.button}>
         <Text style={{ color: "white" }}>Sign in</Text>
       </TouchableOpacity>
 
@@ -47,3 +44,30 @@ export default function Login() {
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: "center",
+    padding: 20,
+  },
+  logoContainer: {
+    alignItems: "center",
+    marginBottom: 20,
+  },
+  logo: {
+    width: 400,
+    height: 200,
+  },
+  input: {
+    height: 40,
+    borderColor: "gray",
+    borderWidth: 1,
+    marginBottom: 10,
+  },
+  button: {
+    backgroundColor: "orange",
+    padding: 10,
+    alignItems: "center",
+  },
+});
