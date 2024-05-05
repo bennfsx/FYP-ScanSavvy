@@ -8,8 +8,6 @@ import QRscanner from "./partials/QRscanner";
 
 const Stack = createStackNavigator();
 
-
-
 export default function App() {
   return (
     <NavigationContainer>
