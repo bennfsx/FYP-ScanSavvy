@@ -14,7 +14,7 @@ import { useNavigation } from "@react-navigation/native";
 const INPUT_OFFSET = 110;
 
 // Import your image from the assets folder
-import ScansavvyLogo from "../assets/image/scansavvyTrans.jpg";
+import ScansavvyLogo from "../assets/image/scansavvyTrans.png";
 
 export default function Login() {
   const navigation = useNavigation();
@@ -41,7 +41,7 @@ export default function Login() {
         <View style={styles.header}>
           <View style={styles.headerIcon}>
             {/* Use Image component for the logo */}
-            <Image source={ScansavvyLogo} style={{ width: 80, height: 80 }} />
+            <Image source={ScansavvyLogo} style={{ width: 200, height: 200 }} />
           </View>
           <Text style={styles.title}>
             Welcome to <Text style={{ color: "#FF8A36" }}>ScanSavvy</Text>
@@ -144,11 +144,10 @@ const styles = StyleSheet.create({
   },
   headerIcon: {
     alignSelf: "center",
-    width: 80,
-    height: 80,
-    marginBottom: 36,
-    backgroundColor: "#fff",
-    borderRadius: 16,
+    width: 200,
+    height: 200,
+    // marginBottom: 36,
+    // borderRadius: 16,
     alignItems: "center",
     justifyContent: "center",
   },
