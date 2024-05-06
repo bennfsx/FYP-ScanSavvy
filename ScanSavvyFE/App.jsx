@@ -2,7 +2,7 @@ import React from "react";
 import { StyleSheet } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
-import Login from "./pages/Login";
+import Login from "./pages/login";
 import Home from "./pages/Home";
 import QRscanner from "./partials/QRscanner";
 
