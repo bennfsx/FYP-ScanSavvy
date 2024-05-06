@@ -1,21 +1,51 @@
 import React, { useState, useEffect } from "react";
-import { Text, View, StyleSheet, TouchableOpacity } from "react-native";
-import { Camera, BarCodeScanner } from "expo-camera";
+import {
+  Text,
+  View,
+  StyleSheet,
+  TouchableOpacity,
+  Linking,
+  Alert,
+} from "react-native";
+import { Camera } from "expo-camera";
 
 export default function QRscanner() {
   const [hasPermission, setHasPermission] = useState(null);
   const [scanned, setScanned] = useState(false);
+  const [scannedData, setScannedData] = useState(null);
 
   useEffect(() => {
     (async () => {
-      const { status } = await Camera.requestPermissionsAsync();
+      const { status } = await Camera.requestCameraPermissionsAsync();
       setHasPermission(status === "granted");
     })();
   }, []);
 
   const handleBarCodeScanned = ({ type, data }) => {
     setScanned(true);
-    alert(`Scanned QR code with data: ${data}`);
+    setScannedData(data);
+  };
+
+  const handleRedirectConfirmation = () => {
+    Alert.alert(
+      "Redirect Confirmation",
+      `Do you want to open the following URL?\n\n${scannedData}`,
+      [
+        {
+          text: "Cancel",
+          onPress: () => setScanned(false),
+          style: "cancel",
+        },
+        {
+          text: "Open",
+          onPress: () => {
+            Linking.openURL(scannedData);
+            setScanned(false);
+          },
+        },
+      ],
+      { cancelable: false }
+    );
   };
 
   if (hasPermission === null) {
@@ -34,10 +64,10 @@ export default function QRscanner() {
       />
       {scanned && (
         <TouchableOpacity
-          onPress={() => setScanned(false)}
+          onPress={handleRedirectConfirmation}
           style={styles.rescanButton}
         >
-          <Text style={styles.buttonText}>Tap to Scan Again</Text>
+          <Text style={styles.buttonText}>Tap to Confirm and Redirect</Text>
         </TouchableOpacity>
       )}
     </View>
