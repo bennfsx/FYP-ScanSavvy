@@ -3,16 +3,10 @@ const router = express.Router();
 
 const auth = require("../middleware/authMiddleware");
 
-const {
-  signin,
-  refresh,
-  signupAtt,
-  signupOrg,
-} = require("../controllers/authController");
+const { signin, refresh, signup } = require("../controllers/authController");
 
 //Signup Endpoint
-router.put("/signupAtt", signupAtt);
-router.put("/signupOrg", signupOrg);
+router.put("/signup", signup);
 
 //Signin Endpoint
 router.post("/signin", signin);
