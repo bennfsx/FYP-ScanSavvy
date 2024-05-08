@@ -99,7 +99,7 @@ export default function Login() {
 
           {/* Sign up link */}
           <TouchableOpacity
-            onPress={() => navigation.navigate("SignUp")}
+            onPress={() => navigation.navigate("Register")}
             style={{ alignSelf: "center", marginTop: 20 }}
           >
             <Text style={{ color: "#000" }}>
