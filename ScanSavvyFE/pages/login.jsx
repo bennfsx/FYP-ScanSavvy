@@ -41,7 +41,7 @@ export default function Login() {
         <View style={styles.header}>
           <View style={styles.headerIcon}>
             {/* Use Image component for the logo */}
-            <Image source={ScansavvyLogo} style={{ width: 200, height: 200 }} />
+            <Image source={ScansavvyLogo} style={{ width: 560, height: 150 }} />
           </View>
           <Text style={styles.title}>
             Welcome to <Text style={{ color: "#FF8A36" }}>ScanSavvy</Text>
