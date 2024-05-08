@@ -7,7 +7,7 @@ const signup = async (req, res) => {
   try {
     // Check if the email is already registered
     const existingUser = await pool.query(
-      "SELECT * FROM Users WHERE email = ?",
+      "SELECT * FROM users WHERE email = ?",
       [req.body.email]
     );
     if (existingUser.length > 0) {
@@ -21,19 +21,17 @@ const signup = async (req, res) => {
     const passwordHash = await bcrypt.hash(req.body.password, 12);
 
     // Generate a unique userID
-    const userID = uuidv4();
 
     // Insert the new user into the Users table
     await pool.query(
-      "INSERT INTO Users (userID, UserType, Email, Mobile, FirstName, LastName, Password) VALUES (?, ?, ?, ?, ?, ?, ?)",
+      "INSERT INTO users ( UserType, Email, Mobile, FirstName, LastName, Password) VALUES (?, ?, ?, ?, ?, ?)",
       [
-        userID,
-        "user",
         req.body.email,
         req.body.mobile,
         req.body.firstName,
         req.body.lastName,
         passwordHash,
+        "user",
       ]
     );
 
