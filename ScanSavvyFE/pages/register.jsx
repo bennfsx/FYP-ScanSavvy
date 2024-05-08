@@ -16,14 +16,15 @@ import ScansavvyLogo from "../assets/image/scansavvyTrans.png";
 
 export default function Register() {
   const [form, setForm] = useState({
-    firstname: "",
-    lastname: "",
-    emailaddress: "",
-    password: ""
+    firstName: "",
+    lastName: "",
+    email: "",
+    password: "",
+    mobile: ""
   });
 
   const handleRegister = () => {
-    if (form.firstname && form.lastname && form.emailaddress && form.password === "") {
+    if (form.firstName && form.lastName && form.email && form.password === "") {
       alert("All the fields are required")
     }
   };
@@ -45,22 +46,22 @@ export default function Register() {
         <View style={styles.input}>
           <Text style={styles.inputLabel}>First Name</Text>
           <TextInput 
-            onChangeText={(firstname) => setForm({ ...form, firstname })}
+            onChangeText={(firstName) => setForm({ ...form, firstName })}
             placeholder=""
             placeholderTextColor="#6b7280"
             style={styles.inputControl}
-            value={form.firstname}
+            value={form.firstName}
           />
         </View>
         {/* Last Name Field */}
         <View style={styles.input}>
           <Text style={styles.inputLabel}>Last Name</Text>
           <TextInput 
-            onChangeText={(lastname) => setForm({ ...form, lastname })}
+            onChangeText={(lastName) => setForm({ ...form, lastName })}
             placeholder=""
             placeholderTextColor="#6b7280"
             style={styles.inputControl}
-            value={form.lastname}
+            value={form.lastName}
           />
         </View>
         {/* Email Address Field */}
@@ -69,11 +70,24 @@ export default function Register() {
           <TextInput 
             keyboardType="email-address"
             autoCorrect={false}
-            onChangeText={(emailaddress) => setForm({ ...form, emailaddress })}
+            onChangeText={(email) => setForm({ ...form, email })}
             placeholder=""
             placeholderTextColor="#6b7280"
             style={styles.inputControl}
-            value={form.emailaddress}
+            value={form.email}
+          />
+        </View>
+        {/* Mobile Phone Field */}
+        <View style={styles.input}>
+          <Text style={styles.inputLabel}>Mobile Phone</Text>
+          <TextInput 
+            keyboardType="numeric"
+            autoCorrect={false}
+            onChangeText={(mobile) => setForm({ ...form, mobile })}
+            placeholder=""
+            placeholderTextColor="#6b7280"
+            style={styles.inputControl}
+            value={form.mobile}
           />
         </View>
         {/* Password Field */}
