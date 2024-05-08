@@ -12,6 +12,10 @@ export default function Home() {
     navigation.navigate("QRscanner"); // Navigate to the QRscanner screen
   };
 
+  const handleAccountPress = () => {
+    navigation.navigate("Account"); // Navigate to My Account screen
+  }
+
   return (
     <SafeAreaView style={{ flex: 1 }}>
       {/* Your main content */}
@@ -20,7 +24,10 @@ export default function Home() {
       </View>
 
       {/* Footer */}
-      <Footer onScanPress={handleScanPress} />
+      <Footer 
+        onScanPress={handleScanPress}
+        onAccountPress={handleAccountPress} 
+      />
     </SafeAreaView>
   );
 }
