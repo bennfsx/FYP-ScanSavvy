@@ -1,16 +1,16 @@
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const { v4: uuidv4 } = require("uuid");
-const pool = require("../db/db"); // Import your PostgreSQL connection pool
+const pool = require("../db/db"); // Import your MySQL connection pool
 
 const signup = async (req, res) => {
   try {
     // Check if the email is already registered
     const existingUser = await pool.query(
-      "SELECT * FROM Users WHERE email = $1",
+      "SELECT * FROM Users WHERE email = ?",
       [req.body.email]
     );
-    if (existingUser.rows.length > 0) {
+    if (existingUser.length > 0) {
       return res.status(400).json({
         status: "error",
         msg: "Duplicate email, user already registered",
@@ -20,16 +20,12 @@ const signup = async (req, res) => {
     // Hash the password
     const passwordHash = await bcrypt.hash(req.body.password, 12);
 
-    // Insert the new user into the database
-    const userQueryResult = await pool.query(
-      "INSERT INTO Users (UserType, Email, Password) VALUES ($1, $2, $3) RETURNING UserID",
-      ["user", req.body.email, passwordHash]
-    );
-    const userID = userQueryResult.rows[0].userid; // Get the inserted UserID
+    // Generate a unique userID
+    const userID = uuidv4();
 
-    // Insert the user into the EventAttendee table with first name and last name
+    // Insert the new user into the Users table
     await pool.query(
-      "INSERT INTO User (UserID, UserType, Email, Mobile, FirstName, LastName) VALUES ($1, $2, $3, $4, $5, $6)",
+      "INSERT INTO Users (userID, UserType, Email, Mobile, FirstName, LastName, Password) VALUES (?, ?, ?, ?, ?, ?, ?)",
       [
         userID,
         "user",
@@ -37,6 +33,7 @@ const signup = async (req, res) => {
         req.body.mobile,
         req.body.firstName,
         req.body.lastName,
+        passwordHash,
       ]
     );
 
@@ -47,58 +44,12 @@ const signup = async (req, res) => {
   }
 };
 
-// const signupOrg = async (req, res) => {
-//   try {
-//     // Check if the email is already registered
-//     const existingUser = await pool.query(
-//       "SELECT * FROM Users WHERE email = $1",
-//       [req.body.email]
-//     );
-//     if (existingUser.rows.length > 0) {
-//       return res.status(400).json({
-//         status: "error",
-//         msg: "Duplicate email, user already registered",
-//       });
-//     }
-
-//     // Hash the password
-//     const passwordHash = await bcrypt.hash(req.body.password, 12);
-
-//     // Insert the new user into the database
-//     const userQueryResult = await pool.query(
-//       "INSERT INTO Users (UserType, Email, Password) VALUES ($1, $2, $3) RETURNING UserID",
-//       ["eventorganizer", req.body.email, passwordHash]
-//     );
-//     const userID = userQueryResult.rows[0].userid; // Corrected property name
-
-//     // Insert the user into the EventOrganizer table with first name and last name
-//     await pool.query(
-//       "INSERT INTO eventorganizer (UserID, UserType, Email, CompanyName, Uennumber, phone, Address) VALUES ($1, $2, $3, $4, $5, $6, $7)",
-//       [
-//         userID,
-//         "eventorganizer",
-//         req.body.email,
-//         req.body.companyName,
-//         req.body.uennumber,
-//         req.body.phone,
-//         req.body.address,
-//       ]
-//     );
-
-//     res.status(200).json({ status: "ok", msg: "User registered successfully" });
-//   } catch (err) {
-//     console.error("Error registering user:", err.message);
-//     res.status(400).json({ status: "error", msg: "Failed registration" });
-//   }
-// };
-
 const signin = async (req, res) => {
   try {
     // Check if the user exists in the database
-    const result = await pool.query("SELECT * FROM Users WHERE email = $1", [
+    const [user] = await pool.query("SELECT * FROM Users WHERE email = ?", [
       req.body.email,
     ]);
-    const user = result.rows[0];
     if (!user) {
       return res.status(400).json({ status: "error", msg: "Not authorized" });
     }

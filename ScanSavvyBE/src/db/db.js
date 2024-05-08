@@ -1,14 +1,33 @@
-const { Pool } = require("pg");
+const mysql = require("mysql");
 
-const database = process.env.PGDATABASE;
-
-const connectionString = `postgresql://${process.env.PGUSER}:${process.env.PGPASSWORD}@${process.env.PGHOST}:${process.env.PGPORT}/${database}`;
-
-const pool = new Pool({
-  connectionString: connectionString,
+const pool = mysql.createPool({
+  host: process.env.SQLHOST,
+  port: process.env.SQLPORT,
+  user: process.env.SQLUSER,
+  password: process.env.SQLPASSWORD,
+  database: process.env.SQLDATABASE,
 });
 
 module.exports = {
-  query: (text, params) => pool.query(text, params),
-  end: () => pool.end(),
+  query: (sql, params) => {
+    return new Promise((resolve, reject) => {
+      pool.getConnection((err, connection) => {
+        if (err) {
+          reject(err);
+          return;
+        }
+
+        connection.query(sql, params, (err, rows) => {
+          connection.release();
+
+          if (err) {
+            reject(err);
+            return;
+          }
+
+          resolve(rows);
+        });
+      });
+    });
+  },
 };

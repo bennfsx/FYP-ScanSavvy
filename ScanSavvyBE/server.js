@@ -6,7 +6,7 @@ const rateLimit = require("express-rate-limit");
 const pool = require("./src/db/db.js");
 const { getUsers } = require("./src/controllers/userController.js");
 const authRouter = require("./src/routers/authRouter");
-const eventRouter = require("./src/routers/eventRouters");
+// const eventRouter = require("./src/routers/eventRouters");
 const userRouter = require("./src/routers/userRouter");
 
 // const { notFundError, serverError } = require("./error");
@@ -36,5 +36,4 @@ app.listen(PORT, () => {
 });
 
 app.use("/auth", authRouter);
-app.use("/api", eventRouter);
 app.use("/user", userRouter);
