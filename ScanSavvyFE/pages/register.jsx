@@ -9,6 +9,7 @@ import {
   Image,
 } from "react-native";
 import axiosAPI from "../axsioAPI";
+import { useNavigation } from "@react-navigation/native";
 
 const INPUT_OFFSET = 110;
 
@@ -16,6 +17,7 @@ const INPUT_OFFSET = 110;
 import ScansavvyLogo from "../assets/image/scansavvyTrans.png";
 
 export default function Register() {
+  const navigation = useNavigation();
   const [form, setForm] = useState({
     firstName: "",
     lastName: "",
@@ -37,6 +39,7 @@ export default function Register() {
         // Registration successful, navigate to login screen
         // (You can implement navigation here)
         alert("Registration successful. Please log in.");
+        navigation.navigate("Login");
         console.log(response.data);
       } else {
         // Registration failed
