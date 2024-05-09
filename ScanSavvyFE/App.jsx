@@ -7,21 +7,26 @@ import Home from "./pages/Home";
 import QRscanner from "./partials/QRscanner";
 import Register from "./pages/register";
 import Account from "./pages/account";
+import { UserProvider } from "./context/UserContext";
 
 const Stack = createStackNavigator();
 
 export default function App() {
   return (
-    <NavigationContainer>
-      <Stack.Navigator>
-        <Stack.Screen name="Login" component={Login} />
-        <Stack.Screen name="Home" component={Home} />
-        <Stack.Screen name="QRscanner" component={QRscanner} />
-        <Stack.Screen name="Register" component={Register} />
-        <Stack.Screen name="Account" component={Account} />
-        {/* Add more screens here */}
-      </Stack.Navigator>
-    </NavigationContainer>
+    <UserProvider>
+      {" "}
+      {/* Wrap your entire component hierarchy with UserProvider */}
+      <NavigationContainer>
+        <Stack.Navigator>
+          <Stack.Screen name="Login" component={Login} />
+          <Stack.Screen name="Home" component={Home} />
+          <Stack.Screen name="QRscanner" component={QRscanner} />
+          <Stack.Screen name="Register" component={Register} />
+          <Stack.Screen name="Account" component={Account} />
+          {/* Add more screens here */}
+        </Stack.Navigator>
+      </NavigationContainer>
+    </UserProvider>
   );
 }
 

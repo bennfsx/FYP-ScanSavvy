@@ -26,12 +26,12 @@ const signup = async (req, res) => {
     await pool.query(
       "INSERT INTO users ( UserType, Email, Mobile, FirstName, LastName, Password) VALUES (?, ?, ?, ?, ?, ?)",
       [
+        "user",
         req.body.email,
         req.body.mobile,
         req.body.firstName,
         req.body.lastName,
         passwordHash,
-        "user",
       ]
     );
 
@@ -45,7 +45,7 @@ const signup = async (req, res) => {
 const signin = async (req, res) => {
   try {
     // Check if the user exists in the database
-    const [user] = await pool.query("SELECT * FROM Users WHERE email = ?", [
+    const [user] = await pool.query("SELECT * FROM users WHERE email = ?", [
       req.body.email,
     ]);
     if (!user) {
@@ -62,8 +62,10 @@ const signin = async (req, res) => {
     }
 
     const tokenPayload = {
-      userId: user.userid,
-      usertype: user.usertype, // Include the user's type in the payload
+      userID: user.userID,
+      userType: user.userType,
+      firstName: user.firstName,
+      lastName: user.lastName, // Include the user's type in the payload
     };
 
     const token = jwt.sign(tokenPayload, process.env.ACCESS_SECRET, {

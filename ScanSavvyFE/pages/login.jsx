@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import {
   StyleSheet,
   SafeAreaView,
@@ -10,6 +10,9 @@ import {
 } from "react-native";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { useNavigation } from "@react-navigation/native";
+import axiosAPI from "../axsioAPI";
+import { jwtDecode } from "jwt-decode";
+import { UserContext } from "../context/UserContext"; // Correct import statement
 
 const INPUT_OFFSET = 110;
 
@@ -18,20 +21,62 @@ import ScansavvyLogo from "../assets/image/scansavvyTrans.png";
 
 export default function Login() {
   const navigation = useNavigation();
+  const { setUser } = useContext(UserContext); // Destructure setUser from UserContext
 
   const [form, setForm] = useState({
     email: "",
     password: "",
   });
 
-  const handleLogin = () => {
-    // Perform login logic here
-    // For example, check credentials and if valid, navigate to the Home screen
-    if (form.email === "q" && form.password === "e") {
-      navigation.navigate("Home");
-    } else {
-      // Handle invalid credentials
-      alert("Invalid email or password");
+  const handleLogin = async () => {
+    try {
+      const response = await axiosAPI.post("/auth/signin", {
+        email: form.email,
+        password: form.password,
+      });
+
+      if (response.status === 200) {
+        const data = response.data;
+        if (data.status === "ok") {
+          // Login successful, navigate to Home screen
+          navigation.navigate("Home");
+
+          // Decode the JWT token to extract userId and usertype
+          const decodedToken = jwtDecode(response.data.token);
+          localStorage.setItem("refresh", response.data.refresh);
+          if (decodedToken) {
+            const { userID, userType, firstName, lastName } = decodedToken;
+            console.log("Decoded token:", decodedToken);
+
+            // Set the user context with userId, usertype, and accessToken
+            setUser({
+              accessToken: response.data.token,
+              userID: userID,
+              userType: userType,
+              firstName: firstName,
+              lastName: lastName,
+            });
+
+            // Store data in session storage
+            sessionStorage.setItem("access", response.data.access);
+            sessionStorage.setItem("userType", userType);
+            sessionStorage.setItem("userID", userID);
+            sessionStorage.setItem("firstName", firstName);
+            sessionStorage.setItem("lastName", lastName);
+          }
+        } else {
+          // Handle invalid credentials
+          alert("Invalid email or password");
+        }
+      } else {
+        // Handle non-200 response status
+        console.error("Invalid response status:", response.status);
+        alert("Error logging in. Please try again later.");
+      }
+    } catch (error) {
+      // Handle network errors or other issues
+      console.error("Error logging in:", error.message);
+      alert("Error logging in. Please try again later.");
     }
   };
 
