@@ -8,7 +8,6 @@ import {
   Text,
   View,
   StyleSheet,
-  TextInput,
   TouchableOpacity,
 } from "react-native";
 
@@ -17,6 +16,7 @@ export default function Account() {
   const { logout, user } = useUser();
 
   const navigatetoEditProfile = () => {
+    navigation.navigate("EditProfile");
     console.log("Edit Profile");
   };
   const navigatetoChangePwd = () => {
@@ -30,12 +30,12 @@ export default function Account() {
 
   const accountItems = [
     {
-      icon: "face-recognition",
+      icon: "account",
       text: "Edit Profile",
       action: navigatetoEditProfile,
     },
     {
-      icon: "face-recognition",
+      icon: "lock-outline",
       text: "Change Password",
       action: navigatetoChangePwd,
     },
@@ -93,7 +93,7 @@ export default function Account() {
       </View>
 
       {/* Logout Button */}
-      <View style={{ paddingHorizontal: 20 }}>
+      <View style={{ paddingHorizontal: 20, paddingVertical: 50 }}>
         <TouchableOpacity onPress={handleLogout}>
           <View style={styles.btn}>
             <Text style={styles.btnText}>Log Out</Text>
@@ -115,6 +115,7 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     color: "#1d1d1d",
     marginBottom: 6,
+    paddingHorizontal: 20,
   },
   line: {
     borderBottomColor: "#ccc",

@@ -8,6 +8,7 @@ import QRscanner from "./partials/QRscanner";
 import Register from "./pages/register";
 import Account from "./pages/account";
 import { UserProvider } from "./context/UserContext";
+import EditProfile from "./pages/editProfile";
 
 const Stack = createStackNavigator();
 
@@ -23,6 +24,7 @@ export default function App() {
           <Stack.Screen name="QRscanner" component={QRscanner} />
           <Stack.Screen name="Register" component={Register} />
           <Stack.Screen name="Account" component={Account} />
+          <Stack.Screen name="EditProfile" component={EditProfile} />
           {/* Add more screens here */}
         </Stack.Navigator>
       </NavigationContainer>
