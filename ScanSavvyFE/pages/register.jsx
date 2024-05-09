@@ -1,13 +1,14 @@
 import React, { useState } from "react";
-import{
+import {
   SafeAreaView,
   Text,
   View,
   StyleSheet,
   TextInput,
   TouchableOpacity,
-  Image
-} from 'react-native';
+  Image,
+} from "react-native";
+import axiosAPI from "../axsioAPI";
 
 const INPUT_OFFSET = 110;
 
@@ -20,17 +21,35 @@ export default function Register() {
     lastName: "",
     email: "",
     password: "",
-    mobile: ""
+    mobile: "",
   });
 
-  const handleRegister = () => {
-    if (form.firstName && form.lastName && form.email && form.password === "") {
-      alert("All the fields are required")
+  const handleRegister = async () => {
+    try {
+      if (!form.firstName || !form.lastName || !form.email || !form.password) {
+        alert("All fields are required");
+        return;
+      }
+
+      const response = await axiosAPI.put("/auth/signup", form); // Send registration data using Axios
+
+      if (response.status === 200) {
+        // Registration successful, navigate to login screen
+        // (You can implement navigation here)
+        alert("Registration successful. Please log in.");
+        console.log(response.data);
+      } else {
+        // Registration failed
+        alert(response.data.msg || "Registration failed. Please try again.");
+      }
+    } catch (error) {
+      console.error("Error registering:", error);
+      alert("Registration failed. Please try again.");
     }
   };
 
   return (
-    <SafeAreaView style={{ flex: 1, background: "#e8ecf4"}}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: "#e8ecf4" }}>
       <View style={styles.container}>
         <View style={styles.header}>
           <View style={styles.headerIcon}>
@@ -40,12 +59,12 @@ export default function Register() {
         </View>
       </View>
 
-     {/* The form */}
+      {/* The form */}
       <View style={styles.form}>
         {/* First Name Field */}
         <View style={styles.input}>
           <Text style={styles.inputLabel}>First Name</Text>
-          <TextInput 
+          <TextInput
             onChangeText={(firstName) => setForm({ ...form, firstName })}
             placeholder=""
             placeholderTextColor="#6b7280"
@@ -56,7 +75,7 @@ export default function Register() {
         {/* Last Name Field */}
         <View style={styles.input}>
           <Text style={styles.inputLabel}>Last Name</Text>
-          <TextInput 
+          <TextInput
             onChangeText={(lastName) => setForm({ ...form, lastName })}
             placeholder=""
             placeholderTextColor="#6b7280"
@@ -67,7 +86,7 @@ export default function Register() {
         {/* Email Address Field */}
         <View style={styles.input}>
           <Text style={styles.inputLabel}>Email Address</Text>
-          <TextInput 
+          <TextInput
             keyboardType="email-address"
             autoCorrect={false}
             onChangeText={(email) => setForm({ ...form, email })}
@@ -80,7 +99,7 @@ export default function Register() {
         {/* Mobile Phone Field */}
         <View style={styles.input}>
           <Text style={styles.inputLabel}>Mobile Phone</Text>
-          <TextInput 
+          <TextInput
             keyboardType="numeric"
             autoCorrect={false}
             onChangeText={(mobile) => setForm({ ...form, mobile })}
@@ -93,7 +112,7 @@ export default function Register() {
         {/* Password Field */}
         <View style={styles.input}>
           <Text style={styles.inputLabel}>Password</Text>
-          <TextInput 
+          <TextInput
             autoCorrect={false}
             onChangeText={(password) => setForm({ ...form, password })}
             placeholder=""
@@ -111,7 +130,7 @@ export default function Register() {
             </View>
           </TouchableOpacity>
         </View>
-      </View> 
+      </View>
     </SafeAreaView>
   );
 }
@@ -137,7 +156,7 @@ const styles = StyleSheet.create({
     marginBottom: -100,
     flexGrow: 1,
     flexShrink: 1,
-    paddingHorizontal: 20
+    paddingHorizontal: 20,
   },
   formAction: {
     marginVertical: 24,

@@ -7,16 +7,15 @@ const {
 } = require("../middleware/authMiddleware");
 const {
   getUsers,
-  updateEventOrg,
-  getEventOrgById,
+
+  getUserByID,
 } = require("../controllers/userController");
 
 //Patch
 // router.patch("/update", authUser, updateUser);
 // router.patch("/update/:id", updateUserById);
-router.get("/getuser", authUser, getUsers);
-router.patch("/updateeventorg/:userid", updateEventOrg);
-router.get("/getorganizer/:userid", getEventOrgById);
+router.get("/getuser", getUsers);
+router.get("/getuserbyid/:userid", getUserByID);
 
 //Delete
 // router.delete("/delete/:id", authAdmin, deleteUserById);
