@@ -51,7 +51,7 @@ export default function Account() {
         paddingLeft: 12,
       }}
     >
-      <MaterialCommunityIcons name={icon} size={24} />
+      <MaterialCommunityIcons name={icon} size={30} />
       <Text
         style={{
           marginLeft: 36,
@@ -79,7 +79,6 @@ export default function Account() {
         <View
           style={{
             paddingHorizontal: 20,
-            borderRadius: 12,
             backgroundColor: "#e8ecf4",
           }}
         >
@@ -111,16 +110,17 @@ const styles = StyleSheet.create({
     // justifyContent: "center"
   },
   title: {
-    fontSize: 27,
+    fontSize: 30,
     fontWeight: "700",
     color: "#1d1d1d",
-    marginBottom: 6,
+    marginBottom: 12,
     paddingHorizontal: 20,
   },
   line: {
     borderBottomColor: "#ccc",
     borderBottomWidth: 1,
     width: "100%", // Adjust width as needed
+    marginBottom: 8
   },
   btn: {
     flexDirection: "row",
