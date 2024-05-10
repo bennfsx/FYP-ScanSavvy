@@ -9,6 +9,7 @@ import Register from "./pages/register";
 import Account from "./pages/account";
 import { UserProvider } from "./context/UserContext";
 import EditProfile from "./pages/editProfile";
+import ChangePassword from "./pages/changePassword";
 
 const Stack = createStackNavigator();
 
@@ -25,6 +26,7 @@ export default function App() {
           <Stack.Screen name="Register" component={Register} />
           <Stack.Screen name="Account" component={Account} />
           <Stack.Screen name="EditProfile" component={EditProfile} />
+          <Stack.Screen name="ChangePassword" component={ChangePassword} />
           {/* Add more screens here */}
         </Stack.Navigator>
       </NavigationContainer>

@@ -20,6 +20,7 @@ export default function Account() {
     console.log("Edit Profile");
   };
   const navigatetoChangePwd = () => {
+    navigation.navigate("ChangePassword");
     console.log("Change Password");
   };
   const handleLogout = () => {
