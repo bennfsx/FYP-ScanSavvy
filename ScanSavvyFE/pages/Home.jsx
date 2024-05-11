@@ -4,10 +4,14 @@ import React from "react";
 import { SafeAreaView, View, Text, StyleSheet, FlatList, Image } from "react-native";
 import Footer from "../partials/Footer";
 import { useNavigation } from "@react-navigation/native";
-// Import your image from the assets folder
-import ScansavvyLogo from "../assets/image/scansavvyTrans.png";
+import { useUser } from "./hooks/useUser";
+
 
 export default function Home() {
+  const { user, checkSession } = useUser(); // Provide a default value for user
+  useEffect(() => {
+    checkSession();
+  }, []);
   const navigation = useNavigation();
 
   const handleScanPress = () => {
@@ -45,35 +49,68 @@ export default function Home() {
     rows.push(logos.slice(i, i + 3));
   }
 
-  return (
-    <SafeAreaView style={{ flex: 1 }}>
-      {/* Your main content */}
-      <View style={{ flex: 1 }}>
-        <Text style={{ fontSize: 36, fontWeight: '500', paddingHorizontal: 20, marginTop: 10}}>Welcome</Text>
-        <Text style={{ fontSize: 30, paddingHorizontal: 20}}>{firstName}</Text>
-        {/* Grey box in the middle */}
-        <View style={ styles.greybox }>
-          <Text style={styles.content}>Featured Websites</Text>
-          <View style={styles.container}>
-            <FlatList 
-              data={rows} 
-              keyExtractor={(item, index) => index.toString()} 
-              renderItem={renderRow}
-            />
+  const favrows = [];
+  for (let i = 0; i < Math.min(logos.length, 3); i += 3) {
+    favrows.push(logos.slice(i, i + 3));
+  }
+  if (user.userType === "user") {
+    return (
+      <SafeAreaView style={{ flex: 1 }}>
+        {/* Your main content */}
+        <View style={{ flex: 1 }}>
+          <Text style={{ fontSize: 36, fontWeight: '500', paddingHorizontal: 20, marginTop: 10}}>Welcome</Text>
+          <Text style={{ fontSize: 30, paddingHorizontal: 20}}>{firstName}</Text>
+          {/* Grey box in the middle */}
+          <View style={ styles.greybox }>
+            <View style={styles.headerContainer}>
+              <Text style={styles.content}>Featured Websites</Text>
+              <Text style={styles.viewallContent}>View All</Text>
+            </View>
+            <View style={styles.container}>
+                <FlatList 
+                  data={rows} 
+                  keyExtractor={(item, index) => index.toString()} 
+                  renderItem={renderRow}
+                />
+              </View>
           </View>
-
-          
+          <View style={styles.headerContainer}>
+            <Text style={styles.content}>Favourites</Text>
+            <Text style={styles.viewallContent}>Edit Favourites</Text>
+          </View>
+          <View style={styles.container}>
+                <FlatList 
+                  data={favrows} 
+                  keyExtractor={(item, index) => index.toString()} 
+                  renderItem={renderRow}
+                />
+          </View>
+          <View style={styles.headerContainer}>
+            <Text style={styles.content}>History</Text>
+          </View>
+          <View style={styles.container}>
+                <FlatList 
+                  data={favrows} 
+                  keyExtractor={(item, index) => index.toString()} 
+                  renderItem={renderRow}
+                />
+          </View>
         </View>
-      </View>
 
-      {/* Footer */}
-      <Footer 
-        onScanPress={handleScanPress}
-        onAccountPress={handleAccountPress} 
-      />
-    </SafeAreaView>
-  );
+        {/* Footer */}
+        <Footer 
+          onScanPress={handleScanPress}
+          onAccountPress={handleAccountPress} 
+        />
+      </SafeAreaView>
+    );
+  } else if (user.userType == "admin") {
+    return (
+      <Text>im admin!!!!!!!</Text>
+    );
+  }
 }
+
 
 const styles = StyleSheet.create({
     greybox: {
@@ -87,22 +124,49 @@ const styles = StyleSheet.create({
       marginTop: 20
     },
     container: {
-      flex: 1,
+      // flex: 3,
       justifyContent: 'center',
-      alignItems: 'center',
+      // alignItems: 'left',
     },
     row: {
       flexDirection: 'row',
       justifyContent: 'center',
       alignItems: 'center',
       marginBottom: 10,
+      padding: '5px',
+      margin: '5px',
+    },
+    favrows: {
+      flexDirection: 'row',
+      justifyContent: 'center',
+      alignItems: 'center',
+      marginBottom: 10,
+      padding: '5px',
+      margin: '5px',
     },
     logoContainer: {
-      padding: 10,
+      flex: 3,
+      // margin: '10px 20px 10px',
+      // justifyContent: 'center',
+      // alignContent: 'center',
     },
     logo: {
-      width: 100,
-      height: 100,
+      width: 130,
+      height: 80,
+      margin: '10px',
       resizeMode: 'contain',
     },
+    headerContainer: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      paddingHorizontal: 10,
+      marginBottom: 10,
+    },
+    viewallContent: {
+      fontSize: 16,
+      // paddingHorizontal: 20,
+      marginTop: 20,
+      color: '#FF914D',
+    }
 });
