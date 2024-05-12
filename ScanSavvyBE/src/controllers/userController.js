@@ -50,7 +50,60 @@ const getUserByID = async (req, res) => {
   }
 };
 
+const updateUserByID = async (req, res) => {
+  try {
+    const { userid } = req.params;
+    const { firstName, lastName, email, mobile } = req.body;
+
+    const updateFields = [];
+    const queryParams = [];
+
+    // Iterate over the fields in the request body
+    for (const [key, value] of Object.entries(req.body)) {
+      // Skip fields that are undefined or userID
+      if (value === undefined || key === "userID") {
+        continue;
+      }
+
+      // Add field to the updateFields array
+      updateFields.push(`${key} = ?`);
+
+      // Add corresponding value to the queryParams array
+      queryParams.push(value);
+    }
+
+    // Construct the SQL query
+    let query =
+      "UPDATE users SET " + updateFields.join(", ") + " WHERE userID = ?";
+    queryParams.push(userid);
+
+    // Execute the SQL query with the provided userID and user information
+    await pool.query(query, queryParams);
+
+    // Send success response
+    res.json({
+      status: "success",
+      message: "User information updated successfully",
+    });
+  } catch (error) {
+    // Check if error is due to email uniqueness constraint violation
+    if (error.code === "ER_DUP_ENTRY") {
+      return res.status(400).json({
+        status: "error",
+        message: "Email already exists",
+      });
+    }
+
+    console.error("Error updating user by ID:", error);
+    res.status(500).json({
+      status: "error",
+      message: "Failed to update user information",
+    });
+  }
+};
+
 module.exports = {
   getUsers,
   getUserByID,
+  updateUserByID,
 };

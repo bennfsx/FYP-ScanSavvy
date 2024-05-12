@@ -1,4 +1,4 @@
-import { React, useEffect, useRef } from "react";
+import { React, useEffect, useRef, useState } from "react";
 import {
   SafeAreaView,
   View,
@@ -11,10 +11,40 @@ import {
 import Footer from "../partials/Footer";
 import { useNavigation } from "@react-navigation/native";
 import { useUser } from "../hooks/useUser";
+import axiosAPI from "../axsioAPI";
 
 export default function Home() {
   const { user, checkSession } = useUser(); // Provide a default value for user
+  const [userProfile, setUserProfile] = useState("");
+  const [loading, setLoading] = useState(true);
+
+  const [formData, setFormData] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    mobile: "",
+  });
+
+  const fetchUserProfile = async () => {
+    try {
+      const response = await axiosAPI.get(`user/getuserbyid/${user.userID}`);
+      setUserProfile(response.data.data);
+      setFormData({
+        firstName: response.data.data.firstName,
+        lastName: response.data.data.lastName,
+        email: response.data.data.email,
+        mobile: response.data.data.mobile,
+      });
+      setLoading(false);
+      console.log(response);
+    } catch (error) {
+      console.error("Error fetching user profile:", error);
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
+    fetchUserProfile();
     checkSession();
   }, []);
   const navigation = useNavigation();
@@ -74,7 +104,7 @@ export default function Home() {
             Welcome
           </Text>
           <Text style={{ fontSize: 30, paddingHorizontal: 20 }}>
-            {firstName}
+            {`${formData.firstName} ${formData.lastName}!`}
           </Text>
           {/* Grey box in the middle */}
           <View style={styles.greybox}>

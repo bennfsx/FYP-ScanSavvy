@@ -9,6 +9,7 @@ const {
   getUsers,
 
   getUserByID,
+  updateUserByID,
 } = require("../controllers/userController");
 
 //Patch
@@ -16,6 +17,7 @@ const {
 // router.patch("/update/:id", updateUserById);
 router.get("/getuser", getUsers);
 router.get("/getuserbyid/:userid", getUserByID);
+router.patch("/updateuserbyid/:userid", updateUserByID);
 
 //Delete
 // router.delete("/delete/:id", authAdmin, deleteUserById);
