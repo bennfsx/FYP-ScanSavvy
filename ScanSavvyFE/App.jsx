@@ -12,6 +12,7 @@ import { UserProvider } from "./context/UserContext";
 import EditProfile from "./pages/editProfile";
 import ChangePassword from "./pages/changePassword";
 import Favourites from "./pages/favourites";
+import FeaturedWebs from "./pages/featureweb";
 
 const Stack = createStackNavigator();
 
@@ -33,6 +34,7 @@ function App() {
           <Stack.Screen name="EditProfile" component={EditProfile} />
           <Stack.Screen name="ChangePassword" component={ChangePassword} />
           <Stack.Screen name="Favourites" component={Favourites} />
+          <Stack.Screen name="FeaturedWebs" component={FeaturedWebs} />
           {/* Add more screens here */}
         </Stack.Navigator>
       </NavigationContainer>

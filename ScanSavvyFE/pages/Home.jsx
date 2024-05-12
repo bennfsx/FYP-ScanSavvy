@@ -64,7 +64,11 @@ export default function Home() {
           <View style={ styles.greybox }>
             <View style={styles.headerContainer}>
               <Text style={styles.content}>Featured Websites</Text>
+              <TouchableOpacity
+              onPress={() => navigation.navigate("FeaturedWebs")}
+              >
               <Text style={styles.viewallContent}>View All</Text>
+              </TouchableOpacity>
             </View>
             <View style={styles.container}>
                 <FlatList 
@@ -72,7 +76,7 @@ export default function Home() {
                   keyExtractor={(item, index) => index.toString()} 
                   renderItem={renderRow}
                 />
-              </View>
+            </View>
           </View>
           <View style={styles.headerContainer}>
             <Text style={styles.content}>Favourites</Text>
