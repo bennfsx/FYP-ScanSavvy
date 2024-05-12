@@ -1,17 +1,17 @@
 // Home.jsx
 
 import React from "react";
-import { SafeAreaView, View, Text, StyleSheet, FlatList, Image } from "react-native";
+import { SafeAreaView, View, Text, StyleSheet, FlatList, Image, TouchableOpacity } from "react-native";
 import Footer from "../partials/Footer";
 import { useNavigation } from "@react-navigation/native";
-import { useUser } from "./hooks/useUser";
+// import { useUser } from "./hooks/useUser";
 
 
 export default function Home() {
-  const { user, checkSession } = useUser(); // Provide a default value for user
-  useEffect(() => {
-    checkSession();
-  }, []);
+  // const { user, checkSession } = useUser(); // Provide a default value for user
+  // useEffect(() => {
+  //   checkSession();
+  // }, []);
   const navigation = useNavigation();
 
   const handleScanPress = () => {
@@ -53,7 +53,7 @@ export default function Home() {
   for (let i = 0; i < Math.min(logos.length, 3); i += 3) {
     favrows.push(logos.slice(i, i + 3));
   }
-  if (user.userType === "user") {
+  // if (user.userType === "user") {
     return (
       <SafeAreaView style={{ flex: 1 }}>
         {/* Your main content */}
@@ -76,7 +76,11 @@ export default function Home() {
           </View>
           <View style={styles.headerContainer}>
             <Text style={styles.content}>Favourites</Text>
+            <TouchableOpacity
+              onPress={() => navigation.navigate("Favourites")}
+            >
             <Text style={styles.viewallContent}>Edit Favourites</Text>
+            </TouchableOpacity>
           </View>
           <View style={styles.container}>
                 <FlatList 
@@ -104,11 +108,11 @@ export default function Home() {
         />
       </SafeAreaView>
     );
-  } else if (user.userType == "admin") {
-    return (
-      <Text>im admin!!!!!!!</Text>
-    );
-  }
+  // } else if (user.userType == "admin") {
+    // return (
+    //   <Text>im admin!!!!!!!</Text>
+    // );
+  // }
 }
 
 
