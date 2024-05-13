@@ -155,7 +155,7 @@ export default function UserMgmt() {
                             placeholder="Phone"
                             onChangeText={(text) => setNewUser({ ...newUser, phone: text })}
                         />
-                        <Button title="Save" onPress={handleSaveUser} />
+                        <Button title="Save User" onPress={handleSaveUser} />
                     </View>
                 </View>
             </Modal>
@@ -216,13 +216,7 @@ export default function UserMgmt() {
                         value={editUser ? editUser.phone : ''}
                         onChangeText={(text) => setEditUser({ ...editUser, phone: text })}
                     />
-                    <TextInput
-                        style={styles.input}
-                        placeholder="Status"
-                        value={editUser ? editUser.status : ''}
-                        onChangeText={(text) => setEditUser({ ...editUser, status: text })}
-                    />
-                    <Button title="Save" onPress={confirmEdit} />
+                    <Button title="Save User" onPress={confirmEdit} />
                 </View>
             </View>
             </Modal>

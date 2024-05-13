@@ -155,7 +155,7 @@ export default function VendorMgmt() {
                             placeholder="Phone"
                             onChangeText={(text) => setNewVendor({ ...newVendor, phone: text })}
                         />
-                        <Button title="Save" onPress={handleSaveVendor} />
+                        <Button title="Save Vendor" onPress={handleSaveVendor} />
                     </View>
                 </View>
             </Modal>
@@ -216,13 +216,7 @@ export default function VendorMgmt() {
                         value={editVendor ? editVendor.phone : ''}
                         onChangeText={(text) => setEditVendor({ ...editVendor, phone: text })}
                     />
-                    <TextInput
-                        style={styles.input}
-                        placeholder="Status"
-                        value={editVendor ? editVendor.status : ''}
-                        onChangeText={(text) => setEditVendor({ ...editVendor, status: text })}
-                    />
-                    <Button title="Save" onPress={confirmEdit} />
+                    <Button title="Save Vendor" onPress={confirmEdit} />
                 </View>
             </View>
             </Modal>
