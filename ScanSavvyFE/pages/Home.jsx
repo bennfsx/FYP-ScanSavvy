@@ -12,6 +12,7 @@ import Footer from "../partials/Footer";
 import { useNavigation } from "@react-navigation/native";
 import { useUser } from "../hooks/useUser";
 import axiosAPI from "../axsioAPI";
+import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 
 export default function Home() {
   const { user, checkSession } = useUser(); // Provide a default value for user
@@ -57,7 +58,10 @@ export default function Home() {
     navigation.navigate("Account"); // Navigate to My Account screen
   };
 
-  const firstName = "Jane Tan Jun Ting";
+  // Retrieve the count for vendors and users to display
+  const vendorCount = 5;
+  const userCount = 39;
+
   const logos = [
     { id: 1, source: require("../assets/image/scansavvyTrans.png") },
     { id: 2, source: require("../assets/image/scansavvyTrans.png") },
@@ -157,7 +161,42 @@ export default function Home() {
       </SafeAreaView>
     );
   } else if (user.userType == "admin") {
-    return <Text>im admin!!!!!!!</Text>;
+    return (
+      <SafeAreaView style={{ flex: 1 }}>
+        {/* Your main content */}
+        <View style={{ flex: 1 }}>
+          <Text
+            style={{
+              fontSize: 36,
+              fontWeight: "500",
+              paddingHorizontal: 20,
+              marginTop: 10,
+            }}
+          >
+            Welcome
+          </Text>
+          <Text style={{ fontSize: 30, paddingHorizontal: 20 }}>
+            {`${formData.firstName}!`}
+          </Text>
+          <View style={styles.container2}>
+          <View style={styles.boxVendor}>
+            <Text style={styles.boxText}>Vendors</Text>
+            <Text style={styles.countText}>{vendorCount}</Text>
+            <TouchableOpacity style={styles.arrow} onPress={() => navigation.navigate("VendorMgmt")}>
+              <MaterialCommunityIcons name="arrow-right" size={24} color="white" />
+            </TouchableOpacity>
+          </View>
+          <View style={styles.boxUser}>
+            <Text style={styles.boxText}>Active Users</Text>
+            <Text style={styles.countText}>{userCount}</Text>
+            <TouchableOpacity style={styles.arrow} onPress={() => navigation.navigate("UserMgmt")}>
+              <MaterialCommunityIcons name="arrow-right" size={24} color="white" />
+            </TouchableOpacity>
+          </View>
+        </View>
+        </View>
+      </SafeAreaView>
+    )
   }
 }
 
@@ -173,9 +212,7 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   container: {
-    // flex: 3,
     justifyContent: "center",
-    // alignItems: 'left',
   },
   row: {
     flexDirection: "row",
@@ -195,9 +232,6 @@ const styles = StyleSheet.create({
   },
   logoContainer: {
     flex: 3,
-    // margin: '10px 20px 10px',
-    // justifyContent: 'center',
-    // alignContent: 'center',
   },
   logo: {
     width: 130,
@@ -214,8 +248,53 @@ const styles = StyleSheet.create({
   },
   viewallContent: {
     fontSize: 16,
-    // paddingHorizontal: 20,
     marginTop: 20,
     color: "#FF914D",
+  },
+  container2: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingHorizontal: 20,
+    paddingTop: 50,
+  },
+  boxVendor: {
+    width: '45%',
+    height: 130,
+    backgroundColor: '#0070F4',
+    borderRadius: 20,
+    justifyContent: 'flex-start',
+    alignItems: 'flex-start',
+    padding: 10,
+    position: 'relative',
+    elevation: 20,
+  },
+  boxUser: {
+    width: '45%',
+    height: 130,
+    backgroundColor: '#000000',
+    borderRadius: 20,
+    justifyContent: 'flex-start',
+    alignItems: 'flex-start',
+    padding: 10,
+    position: 'relative',
+    elevation: 5,
+  },
+  boxText: {
+    color: '#fff',
+    fontSize: 22,
+    fontWeight: 'bold',
+    alignSelf: 'flex-start',
+  },
+  countText: {
+    color: '#fff',
+    fontSize: 40,
+    alignSelf: 'flex-start',
+    marginTop: 5,
+    fontWeight: 'bold',
+  },
+  arrow: {
+    position: 'absolute',
+    top: 10,
+    right: 10,
   },
 });

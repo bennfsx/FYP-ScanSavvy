@@ -13,6 +13,9 @@ import EditProfile from "./pages/editProfile";
 import ChangePassword from "./pages/changePassword";
 import Favourites from "./pages/favourites";
 import FeaturedWebs from "./pages/featureweb";
+import VendorMgmt from "./pages/vendormgmt";
+import UserMgmt from "./pages/usermgmt"
+
 
 const Stack = createStackNavigator();
 
@@ -50,6 +53,8 @@ function App() {
           <Stack.Screen name="Account" component={Account} />
           <Stack.Screen name="EditProfile" component={EditProfile} />
           <Stack.Screen name="ChangePassword" component={ChangePassword} />
+          <Stack.Screen name="VendorMgmt" component={VendorMgmt} />
+          <Stack.Screen name="UserMgmt" component={UserMgmt} />
           {/* Add more screens here */}
         </Stack.Navigator>
       </NavigationContainer>
