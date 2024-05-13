@@ -102,8 +102,58 @@ const updateUserByID = async (req, res) => {
   }
 };
 
+const changeUserPassword = async (req, res) => {
+  try {
+    // Extract necessary data from the request parameters
+    const { userid } = req.params;
+    const { currentPassword, newPassword } = req.body;
+
+    // Check if the user exists
+    const user = await pool.query("SELECT * FROM users WHERE userID = ?", [
+      userid,
+    ]);
+    if (user.length === 0) {
+      return res
+        .status(404)
+        .json({ status: "error", message: "User not found" });
+    }
+
+    // Check if the current password matches the stored password
+    if (!currentPassword) {
+      return res
+        .status(400)
+        .json({ status: "error", message: "Current password is required" });
+    }
+
+    if (!bcrypt.compareSync(currentPassword, user[0].password)) {
+      return res
+        .status(400)
+        .json({ status: "error", message: "Current password is incorrect" });
+    }
+
+    // Hash the new password
+    const newPasswordHash = await bcrypt.hash(newPassword, 12);
+
+    // Update the password in the database
+    await pool.query("UPDATE users SET password = ? WHERE userID = ?", [
+      newPasswordHash,
+      userid,
+    ]);
+
+    res
+      .status(200)
+      .json({ status: "success", message: "Password updated successfully" });
+  } catch (error) {
+    console.error("Error changing user password:", error.message);
+    res
+      .status(500)
+      .json({ status: "error", message: "Failed to change password" });
+  }
+};
+
 module.exports = {
   getUsers,
   getUserByID,
   updateUserByID,
+  changeUserPassword,
 };
