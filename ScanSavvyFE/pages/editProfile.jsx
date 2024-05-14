@@ -11,7 +11,7 @@ import {
 import { useUser } from "../hooks/useUser";
 import axiosAPI from "../axsioAPI";
 
-export default function editProfile() {
+export default function EditProfile() {
   const { user } = useUser(); // Import the useUser hook to access user data
   const [modalVisible, setModalVisible] = useState(false);
 

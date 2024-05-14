@@ -2,20 +2,19 @@ import { React, useEffect } from "react";
 import { StyleSheet } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
-import Login from "./pages/login";
+import Login from "./pages/Login";
 import Home from "./pages/Home";
 import QRscanner from "./partials/QRscanner";
-import Register from "./pages/register";
-import Account from "./pages/account";
+import Register from "./pages/Register";
+import Account from "./pages/Account";
 import { useUser } from "./hooks/useUser";
 import { UserProvider } from "./context/UserContext";
-import EditProfile from "./pages/editProfile";
-import ChangePassword from "./pages/changePassword";
-import Favourites from "./pages/favourites";
-import FeaturedWebs from "./pages/featureweb";
-import VendorMgmt from "./pages/vendormgmt";
-import UserMgmt from "./pages/usermgmt"
-
+import EditProfile from "./pages/EditProfile";
+import ChangePassword from "./pages/ChangePassword";
+import Favourites from "./pages/Favourites";
+import FeaturedWebs from "./pages/FeaturedWebs";
+import VendorMgmt from "./pages/VendorMgmt";
+import UserMgmt from "./pages/UserMgmt";
 
 const Stack = createStackNavigator();
 
