@@ -151,9 +151,77 @@ const changeUserPassword = async (req, res) => {
   }
 };
 
+const countUser = async (req, res) => {
+  try {
+    // Construct the SQL query to count users with userType = 'user'
+    const query = `
+      SELECT COUNT(*) AS userCount
+      FROM users
+      WHERE userType = 'user'
+    `;
+
+    // Execute the SQL query
+    const result = await pool.query(query);
+
+    // Extract the count from the query result
+    const userCount = result[0].userCount;
+
+    // Send the user count in the response
+    res.json({
+      status: "success",
+      data: {
+        userCount: userCount,
+      },
+    });
+  } catch (error) {
+    console.error("Error counting users by userType:", error);
+    res.status(500).json({
+      status: "error",
+      message: "Failed to count users by userType",
+    });
+  }
+};
+
+const deleteUserById = async (req, res) => {
+  try {
+    const { userid } = req.params;
+
+    // Construct the SQL query to delete the user
+    const query = `
+      DELETE FROM users
+      WHERE userID = ?
+    `;
+
+    // Execute the SQL query with the provided userID
+    const result = await pool.query(query, [userid]);
+
+    // Check if the user with the specified ID was deleted
+    if (result.affectedRows === 0) {
+      return res.status(404).json({
+        status: "error",
+        message: "User not found",
+      });
+    }
+
+    // Send the success response
+    res.json({
+      status: "success",
+      message: "User deleted successfully",
+    });
+  } catch (error) {
+    console.error("Error deleting user by ID:", error);
+    res.status(500).json({
+      status: "error",
+      message: "Failed to delete user by ID",
+    });
+  }
+};
+
 module.exports = {
   getUsers,
   getUserByID,
   updateUserByID,
   changeUserPassword,
+  countUser,
+  deleteUserById,
 };

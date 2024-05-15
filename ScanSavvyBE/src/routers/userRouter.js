@@ -11,17 +11,18 @@ const {
   getUserByID,
   updateUserByID,
   changeUserPassword,
+  countUser,
+  deleteUserById,
 } = require("../controllers/userController");
 
 //Patch
-// router.patch("/update", authUser, updateUser);
-// router.patch("/update/:id", updateUserById);
 router.get("/getuser", getUsers);
 router.get("/getuserbyid/:userid", getUserByID);
 router.patch("/updateuserbyid/:userid", updateUserByID);
 router.patch("/changeuserpassword/:userid", changeUserPassword);
+router.post("/usercount", countUser);
 
 //Delete
-// router.delete("/delete/:id", authAdmin, deleteUserById);
+router.delete("/deletebyuserid/:userid", deleteUserById);
 
 module.exports = router;
