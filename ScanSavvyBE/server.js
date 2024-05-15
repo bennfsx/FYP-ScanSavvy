@@ -8,7 +8,7 @@ const { getUsers } = require("./src/controllers/userController.js");
 const authRouter = require("./src/routers/authRouter");
 // const eventRouter = require("./src/routers/eventRouters");
 const userRouter = require("./src/routers/userRouter");
-
+const adminRouter = require("./src/routers/adminRouter");
 // const { notFundError, serverError } = require("./error");
 // const routes = require("./routes");
 
@@ -37,3 +37,4 @@ app.listen(PORT, () => {
 
 app.use("/auth", authRouter);
 app.use("/user", userRouter);
+app.use("/admin", adminRouter);
