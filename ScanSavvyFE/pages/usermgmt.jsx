@@ -394,6 +394,8 @@ const styles = StyleSheet.create({
     marginVertical: 10,
     marginHorizontal: 10,
     textAlign: "center",
+    width: 100,
+    flexWrap: 'wrap',
   },
   headerCell: {
     fontWeight: "bold",
@@ -401,12 +403,12 @@ const styles = StyleSheet.create({
     paddingVertical: 20,
     paddingHorizontal: 30,
     marginVertical: 10,
-    marginHorizontal: 10, // Added margin
+    marginHorizontal: 10, 
+    width: 100,
   },
   actionsContainer: {
     flexDirection: "row",
-    justifyContent: "center",
-    width: 100,
+    width: 300,
   },
   button: {
     flex: 1,

@@ -1,15 +1,23 @@
 import React, { useState, useEffect } from "react";
 import {
   SafeAreaView,
-  Text,
   View,
   StyleSheet,
-  TouchableOpacity,
   ScrollView,
   Modal,
   TextInput,
   Button,
+  TouchableWithoutFeedback,
+  Keyboard,
 } from "react-native";
+import {
+  DataTable,
+  FAB,
+  Portal,
+  Provider,
+  Text,
+  TouchableRipple,
+} from "react-native-paper";
 import axiosAPI from "../axsioAPI";
 
 export default function VendorMgmt() {
@@ -26,27 +34,28 @@ export default function VendorMgmt() {
     phone: "",
   });
 
-  // Data for the vendor table
-  const [data, setData] = useState({
-    tableHead: ["ID", "Name", "Email", "Website", "Phone", "Status", "Actions"],
-    tableData: [],
-  });
+  const [data, setData] = useState([]);
 
   useEffect(() => {
+    const fetchVendors = async () => {
+      try {
+        const response = await axiosAPI.post("/admin/getvendor");
+        setData(
+          response.data.map((vendor) => ({
+            siteID: vendor.siteID,
+            siteName: vendor.siteName || "",
+            siteURL: vendor.siteURL || "",
+            email: vendor.email || "",
+            phone: vendor.phone || "",
+        }))
+      );
+      } catch (error) {
+        console.error("Error fetching vendors:", error);
+      }
+    };
     fetchVendors();
   }, []);
-
-  const fetchVendors = async () => {
-    try {
-      const response = await axiosAPI.post("/admin/getvendor");
-      setData((prevData) => ({
-        ...prevData,
-        tableData: response.data,
-      }));
-    } catch (error) {
-      console.error("Error fetching vendors:", error);
-    }
-  };
+  
 
   const handleAddVendor = () => {
     setIsModalVisible(true);
@@ -55,7 +64,6 @@ export default function VendorMgmt() {
   const handleSaveVendor = async () => {
     try {
       await axiosAPI.put("/admin/createvendor", newVendor);
-      fetchVendors();
       setIsModalVisible(false);
       setNewVendor({
         siteName: "",
@@ -63,13 +71,23 @@ export default function VendorMgmt() {
         email: "",
         phone: "",
       });
+      const response = await axiosAPI.post("/admin/getvendor");
+        setData(
+          response.data.map((vendor) => ({
+            siteID: vendor.siteID,
+            siteName: vendor.siteName || "",
+            siteURL: vendor.siteURL || "",
+            email: vendor.email || "",
+            phone: vendor.phone || "",
+          }))
+        );
     } catch (error) {
       console.error("Error saving vendor:", error);
     }
   };
 
   const handleEdit = (id) => {
-    const vendor = data.tableData.find((vendor) => vendor.siteID === id);
+    const vendor = data.find((vendor) => vendor.siteID === id);
     setEditVendor(vendor);
     setEditId(id);
     setIsEditModalVisible(true);
@@ -78,8 +96,17 @@ export default function VendorMgmt() {
   const confirmEdit = async () => {
     try {
       await axiosAPI.patch(`/admin/updatevendorbyid/${editId}`, editVendor);
-      fetchVendors();
       setIsEditModalVisible(false);
+      const response = await axiosAPI.post("/admin/getvendor");
+        setData(
+          response.data.map((vendor) => ({
+            siteID: vendor.siteID,
+            siteName: vendor.siteName || "",
+            siteURL: vendor.siteURL || "",
+            email: vendor.email || "",
+            phone: vendor.phone || "",
+          }))
+        );
     } catch (error) {
       console.error("Error updating vendor:", error);
     }
@@ -93,181 +120,226 @@ export default function VendorMgmt() {
   const confirmDelete = async () => {
     try {
       await axiosAPI.delete(`/admin/deletevendorbyid/${deleteId}`);
-      fetchVendors();
       setIsDeleteModalVisible(false);
+      const response = await axiosAPI.post("/admin/getvendor");
+        setData(
+          response.data.map((vendor) => ({
+            siteID: vendor.siteID,
+            siteName: vendor.siteName || "",
+            siteURL: vendor.siteURL || "",
+            email: vendor.email || "",
+            phone: vendor.phone || "",
+          }))
+        );
     } catch (error) {
       console.error("Error deleting vendor:", error);
     }
   };
 
   return (
-    <SafeAreaView style={{ background: "#e8ecf4", paddingHorizontal: 20 }}>
-      <ScrollView horizontal={true}>
-        <View style={styles.container}>
-          <Text style={styles.title}>Vendors</Text>
-          <View style={[styles.row, styles.header]}>
-            {data.tableHead.map((header, index) => (
-              <Text key={index} style={[styles.cell, styles.headerCell]}>
-                {header}
-              </Text>
+    <Provider>
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+      <SafeAreaView style={{ flex:1, background: "#e8ecf4", padding: 20 }}>
+            <Text style={styles.title}>Vendors</Text>
+            <ScrollView horizontal={true}>
+            <DataTable>
+              <DataTable.Header>
+                <DataTable.Title>ID</DataTable.Title>
+                <DataTable.Title>Name</DataTable.Title>
+                <DataTable.Title>Email</DataTable.Title>
+                <DataTable.Title>Website</DataTable.Title>
+                <DataTable.Title>Mobile</DataTable.Title>
+                <DataTable.Title>Actions</DataTable.Title>
+              </DataTable.Header>
+
+            {data.map((vendor, index) => (
+              <DataTable.Row key={index}>
+                <DataTable.Cell>{vendor.siteID}</DataTable.Cell>
+                <DataTable.Cell>{vendor.siteName}</DataTable.Cell>
+                <DataTable.Cell>{vendor.email}</DataTable.Cell>
+                <DataTable.Cell>{vendor.siteURL}</DataTable.Cell>
+                <DataTable.Cell>{vendor.phone}</DataTable.Cell>
+                <DataTable.Cell>
+                    <View style={styles.actionsContainer}>
+                      <TouchableRipple
+                        onPress={() => handleEdit(vendor.siteID)}
+                        style={styles.editButton}
+                        >
+                        <Text style={styles.buttonText}>Edit</Text>
+                      </TouchableRipple>
+                      <TouchableRipple
+                        onPress={() => handleDelete(vendor.siteID)}
+                        style={styles.deleteButton}
+                        >
+                        <Text style={styles.buttonText}>Delete</Text>
+                      </TouchableRipple>
+                    </View>
+                  </DataTable.Cell>
+              </DataTable.Row>
             ))}
-          </View>
-          {data.tableData.map((rowData, index) => (
-            <View key={index} style={styles.row}>
-              <Text style={styles.cell}>{rowData.siteID}</Text>
-              <Text style={styles.cell}>{rowData.siteName}</Text>
-              <Text style={styles.cell}>{rowData.email}</Text>
-              <Text style={styles.cell}>{rowData.siteURL}</Text>
-              <Text style={styles.cell}>{rowData.phone}</Text>
-              <Text style={styles.cell}>{rowData.status}</Text>
-              <View style={styles.actions}>
-                <TouchableOpacity
-                  onPress={() => handleEdit(rowData.siteID)}
-                  style={[styles.button, styles.editButton]}
-                >
-                  <Text style={styles.buttonText}>Edit</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  onPress={() => handleDelete(rowData.siteID)}
-                  style={[styles.button, styles.deleteButton]}
-                >
-                  <Text style={styles.buttonText}>Delete</Text>
-                </TouchableOpacity>
-              </View>
+            </DataTable>
+          </ScrollView>
+        <FAB
+            style={styles.fab}
+            small
+            icon="plus"
+            onPress={handleAddVendor}
+            label="Add Vendor"
+          />
+        {/* Add Vendor Modal */}
+        <Portal>
+          <Modal
+            visible={isModalVisible}
+            animationType="slide"
+            transparent={true}
+            onRequestClose={() => setIsModalVisible(false)}
+          >
+            <TouchableWithoutFeedback 
+              onPress={() => setIsModalVisible(false)}
+            >
+            <View style={styles.modal}>
+              <TouchableWithoutFeedback>
+                <View style={styles.modalContent}>
+                  <Text style={styles.modalTitle}>Add Vendor</Text>
+                  <TextInput
+                    style={styles.input}
+                    placeholder="Name"
+                    value={newVendor.siteName}
+                    onChangeText={(text) =>
+                      setNewVendor({ ...newVendor, siteName: text })
+                    }
+                  />
+                  <TextInput
+                    style={styles.input}
+                    placeholder="Email"
+                    value={newVendor.email}
+                    onChangeText={(text) =>
+                      setNewVendor({ ...newVendor, email: text })
+                    }
+                  />
+                  <TextInput
+                    style={styles.input}
+                    placeholder="Website"
+                    value={newVendor.siteURL}
+                    onChangeText={(text) =>
+                      setNewVendor({ ...newVendor, siteURL: text })
+                    }
+                  />
+                  <TextInput
+                    style={styles.input}
+                    placeholder="Phone"
+                    value={newVendor.phone}
+                    onChangeText={(text) =>
+                      setNewVendor({ ...newVendor, phone: text })
+                    }
+                  />
+                  <Button title="Save Vendor" onPress={handleSaveVendor} />
+                </View>
+              </TouchableWithoutFeedback>
             </View>
-          ))}
-        </View>
-      </ScrollView>
-      <TouchableOpacity onPress={handleAddVendor} style={styles.addButton}>
-        <Text style={styles.addButtonText}>Add Vendor</Text>
-      </TouchableOpacity>
-      <Modal
-        visible={isModalVisible}
-        animationType="slide"
-        transparent={true}
-        onRequestClose={() => setIsModalVisible(false)}
-      >
-        <View style={styles.modal}>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>Add Vendor</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Name"
-              value={newVendor.siteName}
-              onChangeText={(text) =>
-                setNewVendor({ ...newVendor, siteName: text })
-              }
-            />
-            <TextInput
-              style={styles.input}
-              placeholder="Email"
-              value={newVendor.email}
-              onChangeText={(text) =>
-                setNewVendor({ ...newVendor, email: text })
-              }
-            />
-            <TextInput
-              style={styles.input}
-              placeholder="Website"
-              value={newVendor.siteURL}
-              onChangeText={(text) =>
-                setNewVendor({ ...newVendor, siteURL: text })
-              }
-            />
-            <TextInput
-              style={styles.input}
-              placeholder="Phone"
-              value={newVendor.phone}
-              onChangeText={(text) =>
-                setNewVendor({ ...newVendor, phone: text })
-              }
-            />
-            <Button title="Save Vendor" onPress={handleSaveVendor} />
-          </View>
-        </View>
-      </Modal>
-      <Modal
-        visible={isDeleteModalVisible}
-        animationType="slide"
-        transparent={true}
-        onRequestClose={() => setIsDeleteModalVisible(false)}
-      >
-        <View style={styles.modalDelete}>
-          <View style={styles.modalContentDelete}>
-            <Text style={styles.modalTitleDelete}>Confirm Deletion</Text>
-            <Text style={styles.modalTextDelete}>
-              Are you sure you want to delete this vendor?
-            </Text>
-            <View style={styles.modalButtonsDelete}>
-              <TouchableOpacity
-                onPress={() => setIsDeleteModalVisible(false)}
-                style={[styles.modalButtonDelete, styles.cancelButton]}
-              >
-                <Text style={styles.buttonText}>Cancel</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                onPress={confirmDelete}
-                style={[styles.modalButtonDelete, styles.deleteButton]}
-              >
-                <Text style={styles.buttonText}>Delete</Text>
-              </TouchableOpacity>
+          </TouchableWithoutFeedback>
+        </Modal>
+
+        {/* Delete User Modal */}
+        <Modal
+          visible={isDeleteModalVisible}
+          animationType="slide"
+          transparent={true}
+          onRequestClose={() => setIsDeleteModalVisible(false)}
+        >
+          <TouchableWithoutFeedback
+            onPress={() => setIsDeleteModalVisible(false)}
+          >
+          <View style={styles.modalDelete}>
+            <TouchableWithoutFeedback>
+              <View style={styles.modalContentDelete}>
+                <Text style={styles.modalTitleDelete}>Confirm Deletion</Text>
+                <Text style={styles.modalTextDelete}>
+                  Are you sure you want to delete this vendor?
+                </Text>
+                <View style={styles.modalButtonsDelete}>
+                    <TouchableRipple
+                      onPress={() => setIsDeleteModalVisible(false)}
+                      style={[styles.modalButtonDelete, styles.cancelButton]}
+                    >
+                      <Text style={styles.buttonText}>Cancel</Text>
+                    </TouchableRipple>
+                    <TouchableRipple
+                      onPress={confirmDelete}
+                      style={[styles.modalButtonDelete, styles.deleteButton]}
+                    >
+                      <Text style={styles.buttonText}>Delete</Text>
+                    </TouchableRipple>
+                  </View>
+                </View>
+              </TouchableWithoutFeedback>
             </View>
+          </TouchableWithoutFeedback>
+        </Modal>
+
+        {/* Edit Vendor Modal */}
+        <Modal
+          visible={isEditModalVisible}
+          animationType="slide"
+          transparent={true}
+          onRequestClose={() => setIsEditModalVisible(false)}
+        >
+          <TouchableWithoutFeedback 
+            onPress={() => setIsEditModalVisible(false)}
+          >
+          <View style={styles.modal}>
+            <TouchableWithoutFeedback>
+            <View style={styles.modalContent}>
+              <Text style={styles.modalTitle}>Edit Vendor</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="Name"
+                value={editVendor ? editVendor.siteName : ""}
+                onChangeText={(text) =>
+                  setEditVendor({ ...editVendor, siteName: text })
+                }
+              />
+              <TextInput
+                style={styles.input}
+                placeholder="Email"
+                value={editVendor ? editVendor.email : ""}
+                onChangeText={(text) =>
+                  setEditVendor({ ...editVendor, email: text })
+                }
+              />
+              <TextInput
+                style={styles.input}
+                placeholder="Website"
+                value={editVendor ? editVendor.siteURL : ""}
+                onChangeText={(text) =>
+                  setEditVendor({ ...editVendor, siteURL: text })
+                }
+              />
+              <TextInput
+                style={styles.input}
+                placeholder="Phone"
+                value={editVendor ? editVendor.phone : ""}
+                onChangeText={(text) =>
+                  setEditVendor({ ...editVendor, phone: text })
+                }
+              />
+              <Button title="Save Vendor" onPress={confirmEdit} />
+            </View>
+            </TouchableWithoutFeedback>
           </View>
-        </View>
-      </Modal>
-      <Modal
-        visible={isEditModalVisible}
-        animationType="slide"
-        transparent={true}
-        onRequestClose={() => setIsEditModalVisible(false)}
-      >
-        <View style={styles.modal}>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>Edit Vendor</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Name"
-              value={editVendor ? editVendor.siteName : ""}
-              onChangeText={(text) =>
-                setEditVendor({ ...editVendor, siteName: text })
-              }
-            />
-            <TextInput
-              style={styles.input}
-              placeholder="Email"
-              value={editVendor ? editVendor.email : ""}
-              onChangeText={(text) =>
-                setEditVendor({ ...editVendor, email: text })
-              }
-            />
-            <TextInput
-              style={styles.input}
-              placeholder="Website"
-              value={editVendor ? editVendor.siteURL : ""}
-              onChangeText={(text) =>
-                setEditVendor({ ...editVendor, siteURL: text })
-              }
-            />
-            <TextInput
-              style={styles.input}
-              placeholder="Phone"
-              value={editVendor ? editVendor.phone : ""}
-              onChangeText={(text) =>
-                setEditVendor({ ...editVendor, phone: text })
-              }
-            />
-            <Button title="Save Vendor" onPress={confirmEdit} />
-          </View>
-        </View>
-      </Modal>
-    </SafeAreaView>
+          </TouchableWithoutFeedback>
+        </Modal>
+        </Portal>
+      </SafeAreaView>
+    </TouchableWithoutFeedback>
+  </Provider>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    padding: 10,
+    flex: 3,
+    padding: 30,
     justifyContent: "center",
   },
   row: {
@@ -280,16 +352,26 @@ const styles = StyleSheet.create({
   },
   cell: {
     flex: 1,
-    paddingVertical: 10,
-    paddingHorizontal: 5,
+    paddingVertical: 20,
+    paddingHorizontal: 30,
+    marginVertical: 10,
+    marginHorizontal: 10,
     textAlign: "center",
+    width: 100,
+    flexWrap: 'wrap',  
   },
   headerCell: {
     fontWeight: "bold",
     color: "#fff",
+    paddingVertical: 20,
+    paddingHorizontal: 30,
+    marginVertical: 10,
+    marginHorizontal: 10,
+    width: 100,
   },
-  actions: {
+  actionsContainer: {
     flexDirection: "row",
+    width: 400,
   },
   button: {
     flex: 1,
@@ -302,12 +384,19 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: "#fff",
+    fontSize: 14,
   },
   editButton: {
+    borderRadius: 4,
+    padding: 10,
     backgroundColor: "green",
+    marginRight: 5,
   },
   deleteButton: {
+    borderRadius: 4,
+    padding: 10,
     backgroundColor: "red",
+    marginRight: 5,
   },
   cancelButton: {
     backgroundColor: "gray",
@@ -325,6 +414,13 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderRadius: 5,
+  },
+  fab: {
+    position: "absolute",
+    margin: 16,
+    right: 0,
+    bottom: 0,
+    backgroundColor: "#FF914D",
   },
   addButtonText: {
     color: "#fff",
