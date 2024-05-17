@@ -170,18 +170,20 @@ export default function UserMgmt() {
                   <DataTable.Cell>{user.mobile}</DataTable.Cell>
                   <DataTable.Cell>{user.userType}</DataTable.Cell>
                   <DataTable.Cell>
-                    <TouchableRipple
-                      onPress={() => handleEdit(user.userID)}
-                      style={styles.editButton}
-                    >
-                      <Text style={styles.buttonText}>Edit</Text>
-                    </TouchableRipple>
-                    <TouchableRipple
-                      onPress={() => handleDelete(user.userID)}
-                      style={styles.deleteButton}
-                    >
-                      <Text style={styles.buttonText}>Delete</Text>
-                    </TouchableRipple>
+                    <View style={styles.actionsContainer}>
+                      <TouchableRipple
+                        onPress={() => handleEdit(user.userID)}
+                        style={styles.editButton}
+                      >
+                        <Text style={styles.buttonText}>Edit</Text>
+                      </TouchableRipple>
+                      <TouchableRipple
+                        onPress={() => handleDelete(user.userID)}
+                        style={styles.deleteButton}
+                      >
+                        <Text style={styles.buttonText}>Delete</Text>
+                      </TouchableRipple>
+                    </View>
                   </DataTable.Cell>
                 </DataTable.Row>
               ))}
@@ -249,6 +251,7 @@ export default function UserMgmt() {
                       <TextInput
                         style={styles.input}
                         placeholder="Password"
+                        secureTextEntry={true}
                         value={newUser.password}
                         onChangeText={(text) =>
                           setNewUser({ ...newUser, password: text })
@@ -372,8 +375,8 @@ export default function UserMgmt() {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    padding: 10,
+    flex: 3,
+    padding: 30,
     justifyContent: "center",
   },
   row: {
@@ -386,16 +389,24 @@ const styles = StyleSheet.create({
   },
   cell: {
     flex: 1,
-    paddingVertical: 10,
-    paddingHorizontal: 5,
+    paddingVertical: 20,
+    paddingHorizontal: 30,
+    marginVertical: 10, 
+    marginHorizontal: 10, 
     textAlign: "center",
   },
   headerCell: {
     fontWeight: "bold",
     color: "#fff",
+    paddingVertical: 20, 
+    paddingHorizontal: 30, 
+    marginVertical: 10, 
+    marginHorizontal: 10, // Added margin
   },
-  actions: {
+  actionsContainer: {
     flexDirection: "row",
+    justifyContent: "center",
+    width: 100,
   },
   button: {
     flex: 1,
@@ -405,15 +416,21 @@ const styles = StyleSheet.create({
     marginHorizontal: 5,
     justifyContent: "center",
     alignItems: "center",
+    backgroundColor: "#FF914D",
   },
   buttonText: {
     color: "#fff",
+    fontSize: 14,
   },
   editButton: {
-    backgroundColor: "green",
+    borderRadius: 4,
+    padding: 10,
+    backgroundColor: 'green',
     marginRight: 5,
   },
   deleteButton: {
+    borderRadius: 4,
+    padding: 10,
     backgroundColor: "red",
     marginRight: 5,
   },
@@ -430,7 +447,7 @@ const styles = StyleSheet.create({
     margin: 16,
     right: 0,
     bottom: 0,
-    backgroundColor: "blue",
+    backgroundColor: "#FF914D",
   },
   addButtonText: {
     color: "#fff",

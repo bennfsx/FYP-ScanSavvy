@@ -15,6 +15,7 @@ import Favourites from "./pages/Favourites";
 import FeaturedWebs from "./pages/FeaturedWebs";
 import VendorMgmt from "./pages/VendorMgmt";
 import UserMgmt from "./pages/UserMgmt";
+import SuccessMsg from "./pages/SuccessMsg";
 
 const Stack = createStackNavigator();
 
@@ -37,6 +38,7 @@ function App() {
           <Stack.Screen name="ChangePassword" component={ChangePassword} />
           <Stack.Screen name="Favourites" component={Favourites} />
           <Stack.Screen name="FeaturedWebs" component={FeaturedWebs} />
+          <Stack.Screen name="SuccessMsg" component={SuccessMsg} />
           {/* Add more screens here */}
         </Stack.Navigator>
       </NavigationContainer>

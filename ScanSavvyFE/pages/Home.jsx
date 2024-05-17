@@ -115,7 +115,7 @@ export default function Home() {
             <View style={styles.headerContainer}>
               <Text style={styles.content}>Featured Websites</Text>
               <TouchableOpacity
-                onPress={() => navigation.navigate("FeaturedWebs")}
+                onPress={() => navigation.navigate("SuccessMsg")}
               >
                 <Text style={styles.viewallContent}>View All</Text>
               </TouchableOpacity>
