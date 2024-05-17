@@ -17,6 +17,7 @@ import {
   Provider,
   Text,
   TouchableRipple,
+  Searchbar
 } from "react-native-paper";
 import axiosAPI from "../axsioAPI";
 
@@ -35,32 +36,78 @@ export default function VendorMgmt() {
   });
 
   const [data, setData] = useState([]);
+  const [filteredData, setFilteredData] = useState([]);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchMessage, setSearchMessage] = useState('');
 
+  //previous
+  // useEffect(() => {
+  //   const fetchVendors = async () => {
+  //     try {
+  //       const response = await axiosAPI.post("/admin/getvendor");
+  //       setData(
+  //         response.data.map((vendor) => ({
+  //           siteID: vendor.siteID,
+  //           siteName: vendor.siteName || "",
+  //           siteURL: vendor.siteURL || "",
+  //           email: vendor.email || "",
+  //           phone: vendor.phone || "",
+  //       }))
+  //     );
+  //     } catch (error) {
+  //       console.error("Error fetching vendors:", error);
+  //     }
+  //   };
+  //   fetchVendors();
+  // }, []);
   useEffect(() => {
     const fetchVendors = async () => {
       try {
         const response = await axiosAPI.post("/admin/getvendor");
-        setData(
-          response.data.map((vendor) => ({
-            siteID: vendor.siteID,
-            siteName: vendor.siteName || "",
-            siteURL: vendor.siteURL || "",
-            email: vendor.email || "",
-            phone: vendor.phone || "",
-        }))
-      );
+        const vendors = response.data.map((vendor) => ({
+          siteID: vendor.siteID,
+          siteName: vendor.siteName || "",
+          siteURL: vendor.siteURL || "",
+          email: vendor.email || "",
+          phone: vendor.phone || "",
+        }));
+        setData(vendors);
+        setFilteredData(vendors); 
       } catch (error) {
         console.error("Error fetching vendors:", error);
       }
     };
     fetchVendors();
   }, []);
-  
 
   const handleAddVendor = () => {
     setIsModalVisible(true);
   };
-
+  //previous
+  // const handleSaveVendor = async () => {
+  //   try {
+  //     await axiosAPI.put("/admin/createvendor", newVendor);
+  //     setIsModalVisible(false);
+  //     setNewVendor({
+  //       siteName: "",
+  //       siteURL: "",
+  //       email: "",
+  //       phone: "",
+  //     });
+  //     const response = await axiosAPI.post("/admin/getvendor");
+  //       setData(
+  //         response.data.map((vendor) => ({
+  //           siteID: vendor.siteID,
+  //           siteName: vendor.siteName || "",
+  //           siteURL: vendor.siteURL || "",
+  //           email: vendor.email || "",
+  //           phone: vendor.phone || "",
+  //         }))
+  //       );
+  //   } catch (error) {
+  //     console.error("Error saving vendor:", error);
+  //   }
+  // };
   const handleSaveVendor = async () => {
     try {
       await axiosAPI.put("/admin/createvendor", newVendor);
@@ -72,15 +119,15 @@ export default function VendorMgmt() {
         phone: "",
       });
       const response = await axiosAPI.post("/admin/getvendor");
-        setData(
-          response.data.map((vendor) => ({
-            siteID: vendor.siteID,
-            siteName: vendor.siteName || "",
-            siteURL: vendor.siteURL || "",
-            email: vendor.email || "",
-            phone: vendor.phone || "",
-          }))
-        );
+      const vendors = response.data.map((vendor) => ({
+        siteID: vendor.siteID,
+        siteName: vendor.siteName || "",
+        siteURL: vendor.siteURL || "",
+        email: vendor.email || "",
+        phone: vendor.phone || "",
+      }));
+      setData(vendors);
+      setFilteredData(vendors); 
     } catch (error) {
       console.error("Error saving vendor:", error);
     }
@@ -98,42 +145,106 @@ export default function VendorMgmt() {
       await axiosAPI.patch(`/admin/updatevendorbyid/${editId}`, editVendor);
       setIsEditModalVisible(false);
       const response = await axiosAPI.post("/admin/getvendor");
-        setData(
-          response.data.map((vendor) => ({
-            siteID: vendor.siteID,
-            siteName: vendor.siteName || "",
-            siteURL: vendor.siteURL || "",
-            email: vendor.email || "",
-            phone: vendor.phone || "",
-          }))
-        );
+      const vendors = response.data.map((vendor) => ({
+        siteID: vendor.siteID,
+        siteName: vendor.siteName || "",
+        siteURL: vendor.siteURL || "",
+        email: vendor.email || "",
+        phone: vendor.phone || "",
+      }));
+      setData(vendors);
+      setFilteredData(vendors); 
     } catch (error) {
       console.error("Error updating vendor:", error);
     }
   };
+
+  // const confirmEdit = async () => {
+  //   try {
+  //     await axiosAPI.patch(`/admin/updatevendorbyid/${editId}`, editVendor);
+  //     setIsEditModalVisible(false);
+  //     const response = await axiosAPI.post("/admin/getvendor");
+  //       setData(
+  //         response.data.map((vendor) => ({
+  //           siteID: vendor.siteID,
+  //           siteName: vendor.siteName || "",
+  //           siteURL: vendor.siteURL || "",
+  //           email: vendor.email || "",
+  //           phone: vendor.phone || "",
+  //         }))
+  //       );
+  //   } catch (error) {
+  //     console.error("Error updating vendor:", error);
+  //   }
+  // };
 
   const handleDelete = (id) => {
     setDeleteId(id);
     setIsDeleteModalVisible(true);
   };
 
+  // const confirmDelete = async () => {
+  //   try {
+  //     await axiosAPI.delete(`/admin/deletevendorbyid/${deleteId}`);
+  //     setIsDeleteModalVisible(false);
+  //     const response = await axiosAPI.post("/admin/getvendor");
+  //       setData(
+  //         response.data.map((vendor) => ({
+  //           siteID: vendor.siteID,
+  //           siteName: vendor.siteName || "",
+  //           siteURL: vendor.siteURL || "",
+  //           email: vendor.email || "",
+  //           phone: vendor.phone || "",
+  //         }))
+  //       );
+  //   } catch (error) {
+  //     console.error("Error deleting vendor:", error);
+  //   }
+  // };
+
   const confirmDelete = async () => {
     try {
       await axiosAPI.delete(`/admin/deletevendorbyid/${deleteId}`);
       setIsDeleteModalVisible(false);
       const response = await axiosAPI.post("/admin/getvendor");
-        setData(
-          response.data.map((vendor) => ({
-            siteID: vendor.siteID,
-            siteName: vendor.siteName || "",
-            siteURL: vendor.siteURL || "",
-            email: vendor.email || "",
-            phone: vendor.phone || "",
-          }))
-        );
+      const vendors = response.data.map((vendor) => ({
+        siteID: vendor.siteID,
+        siteName: vendor.siteName || "",
+        siteURL: vendor.siteURL || "",
+        email: vendor.email || "",
+        phone: vendor.phone || "",
+      }));
+      setData(vendors);
+      setFilteredData(vendors); 
     } catch (error) {
       console.error("Error deleting vendor:", error);
     }
+  };
+
+  const handleSearch = (query) => {
+    setSearchQuery(query);
+
+    if (query.trim() === "") {
+      setFilteredData(data); // Show all data if search query is empty
+      setSearchMessage('');
+    } else {
+      const filtered = data.filter((vendor) =>
+        vendor.siteName.toLowerCase().includes(query.toLowerCase()) ||
+        vendor.email.toLowerCase().includes(query.toLowerCase()) ||
+        vendor.siteURL.toLowerCase().includes(query.toLowerCase()) ||
+        vendor.phone.includes(query)
+      );
+      setFilteredData(filtered);
+      if (filtered.length === 0) {
+        setSearchMessage('No results found'); // Set the search message
+      } else {
+        setSearchMessage(''); // Clear the search message if there are results
+      }
+    }
+  };
+
+  const handleFocus = () => {
+    setIsFocused(true);
   };
 
   return (
@@ -141,6 +252,13 @@ export default function VendorMgmt() {
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <SafeAreaView style={{ flex:1, background: "#e8ecf4", padding: 20 }}>
             <Text style={styles.title}>Vendors</Text>
+            <Searchbar
+              placeholder="Search Vendors"
+              onChangeText={handleSearch}
+              value={searchQuery}
+              style={styles.searchBar}
+              onFocus={handleFocus}
+            />
             <ScrollView horizontal={true}>
             <DataTable>
               <DataTable.Header>
@@ -151,8 +269,17 @@ export default function VendorMgmt() {
                 <DataTable.Title>Mobile</DataTable.Title>
                 <DataTable.Title>Actions</DataTable.Title>
               </DataTable.Header>
+              {/* Display search message if there are no search results */}
+              {filteredData.length === 0 && (
+                <DataTable.Row>
+                  <DataTable.Cell colSpan={6}>
+                    {searchMessage !== '' ? searchMessage : 'No results found'}
+                  </DataTable.Cell>
+                </DataTable.Row>
+              )}
 
-            {data.map((vendor, index) => (
+            {/* {data.map((vendor, index) => ( */}
+            {filteredData.map((vendor, index) => (
               <DataTable.Row key={index}>
                 <DataTable.Cell>{vendor.siteID}</DataTable.Cell>
                 <DataTable.Cell>{vendor.siteName}</DataTable.Cell>
@@ -480,5 +607,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     borderRadius: 5,
     marginHorizontal: 10,
+  },
+  searchBar: {
+    marginBottom: 20,
   },
 });

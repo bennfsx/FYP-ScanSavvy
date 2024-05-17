@@ -67,6 +67,37 @@ export default function Home() {
     logout();
     navigation.navigate("Login");
   };
+  // Retrieve the count for vendors and users to display
+  const [vendorCount, setVendorCount] = useState("");
+  const [userCount, setUserCount] = useState("");
+
+  useEffect(() => {
+    const fetchCounts = async () => {
+      try {
+        // Fetch vendor count
+        const vendorResponse = await axiosAPI.post("/admin/vendorcount");
+        const fetchedVendorCount = vendorResponse.data.data.vendorCount;
+        setVendorCount(fetchedVendorCount);
+
+        // Fetch user count
+        const userResponse = await axiosAPI.post("/user/usercount");
+        const fetchedUserCount = userResponse.data.data.userCount;
+        setUserCount(fetchedUserCount);
+      } catch (error) {
+        console.error("Error fetching counts:", error);
+      }
+    };
+    fetchCounts();
+  }, []);
+
+  const logos = [
+    { id: 1, source: require("../assets/image/scansavvyTrans.png") },
+    { id: 2, source: require("../assets/image/scansavvyTrans.png") },
+    { id: 3, source: require("../assets/image/scansavvyTrans.png") },
+    { id: 4, source: require("../assets/image/scansavvyTrans.png") },
+    { id: 5, source: require("../assets/image/scansavvyTrans.png") },
+    { id: 6, source: require("../assets/image/scansavvyTrans.png") },
+  ];
 
   // Function to render each row of logos
   const renderRow = ({ item }) => (

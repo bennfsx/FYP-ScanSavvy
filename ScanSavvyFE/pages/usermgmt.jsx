@@ -17,6 +17,7 @@ import {
   Provider,
   Text,
   TouchableRipple,
+  Searchbar
 } from "react-native-paper";
 import axiosAPI from "../axsioAPI"; // Ensure this path is correct
 
@@ -36,26 +37,28 @@ export default function UserMgmt() {
   });
 
   const [data, setData] = useState([]);
+  const [filteredDataUser, setFilteredDataUser] = useState([]);
+  const [searchQueryUser, setSearchQueryUser] = useState("");
+  const [searchMessageUser, setSearchMessageUser] = useState('');
 
   useEffect(() => {
     const fetchUsers = async () => {
       try {
         const response = await axiosAPI.get("/user/getuser");
-        setData(
-          response.data.map((user) => ({
+        const users = response.data.map((user) => ({
             userID: user.userID,
             firstName: user.firstName || "",
             lastName: user.lastName || "",
             email: user.email || "",
             mobile: user.mobile || "",
             userType: user.userType || "",
-          }))
-        );
+          }));
+          setData(users);
+          setFilteredDataUser(users);
       } catch (error) {
         console.error("Error fetching users:", error);
       }
     };
-
     fetchUsers();
   }, []);
 
@@ -75,16 +78,16 @@ export default function UserMgmt() {
         password: "",
       });
       const response = await axiosAPI.get("/user/getuser");
-      setData(
-        response.data.map((user) => ({
+      const users = response.data.map((user) => ({
           userID: user.userID,
           firstName: user.firstName || "",
           lastName: user.lastName || "",
           email: user.email || "",
           mobile: user.mobile || "",
           userType: user.userType || "",
-        }))
-      );
+        }));
+        setData(users);
+        setFilteredDataUser(users);
     } catch (error) {
       console.error("Error saving user:", error);
     }
@@ -102,16 +105,16 @@ export default function UserMgmt() {
       await axiosAPI.patch(`/user/updateuserbyid/${editId}`, editUser); // Adjust the endpoint as necessary
       setIsEditModalVisible(false);
       const response = await axiosAPI.get("/user/getuser");
-      setData(
-        response.data.map((user) => ({
+      const users = response.data.map((user) => ({
           userID: user.userID,
           firstName: user.firstName || "",
           lastName: user.lastName || "",
           email: user.email || "",
           mobile: user.mobile || "",
           userType: user.userType || "",
-        }))
-      );
+        }));
+        setData(users);
+        setFilteredDataUser(users);
     } catch (error) {
       console.error("Error updating user:", error);
     }
@@ -127,19 +130,52 @@ export default function UserMgmt() {
       await axiosAPI.delete(`/user/deletebyuserid/${deleteId}`); // Adjust the endpoint as necessary
       setIsDeleteModalVisible(false);
       const response = await axiosAPI.get("/user/getuser");
-      setData(
-        response.data.map((user) => ({
+      const users = response.data.map((user) => ({
           userID: user.userID,
           firstName: user.firstName || "",
           lastName: user.lastName || "",
           email: user.email || "",
           mobile: user.mobile || "",
           userType: user.userType || "",
-        }))
-      );
+        }));
+        setData(users);
+        setFilteredDataUser(users);
     } catch (error) {
       console.error("Error deleting user:", error);
     }
+  };
+
+  const handleSearchUser = (query) => {
+    setSearchQueryUser(query);
+
+    if (query.trim() === "") {
+      setFilteredDataUser(data); // Show all data if search query is empty
+      setSearchMessageUser('');
+    } else {
+      const filtered = data.filter((user) =>{
+        // Ensure properties exist before calling toLowerCase
+        const firstName = user.firstName ? user.firstName.toLowerCase() : '';
+        const lastName = user.lastName ? user.lastName.toLowerCase() : '';
+        const email = user.email ? user.email.toLowerCase() : '';
+        const mobile = user.mobile ? user.mobile : '';
+
+        // Check if any of the properties match the query
+        return firstName.includes(query.toLowerCase()) ||
+              lastName.includes(query.toLowerCase()) ||
+              email.includes(query.toLowerCase()) ||
+              mobile.includes(query);
+      });
+      setFilteredDataUser(filtered);
+      if (filtered.length === 0) {
+        setSearchMessageUser('No results found'); // Set the search message
+      } else {
+        setSearchMessageUser(''); // Clear the search message if there are results
+      }
+    }
+  };
+
+  const handleFocus = () => {
+    setIsFocused(true);
   };
 
   return (
@@ -149,6 +185,13 @@ export default function UserMgmt() {
           style={{ flex: 1, backgroundColor: "#e8ecf4", padding: 20 }}
         >
           <Text style={styles.title}>Users</Text>
+          <Searchbar
+              placeholder="Search Users"
+              onChangeText={handleSearchUser}
+              value={searchQueryUser}
+              style={styles.searchBar}
+              onFocus={handleFocus}
+            />
           <ScrollView horizontal={true}>
             <DataTable>
               <DataTable.Header>
@@ -160,8 +203,16 @@ export default function UserMgmt() {
                 <DataTable.Title>User Type</DataTable.Title>
                 <DataTable.Title>Actions</DataTable.Title>
               </DataTable.Header>
+              {/* Display search message if there are no search results */}
+              {filteredDataUser.length === 0 && (
+                <DataTable.Row>
+                  <DataTable.Cell colSpan={6}>
+                    {searchMessageUser !== '' ? searchMessageUser : 'No results found'}
+                  </DataTable.Cell>
+                </DataTable.Row>
+              )}
 
-              {data.map((user, index) => (
+              {filteredDataUser.map((user, index) => (
                 <DataTable.Row key={index}>
                   <DataTable.Cell>{user.userID}</DataTable.Cell>
                   <DataTable.Cell>{user.firstName}</DataTable.Cell>
@@ -509,5 +560,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     borderRadius: 5,
     marginHorizontal: 10,
+  },
+  searchBar: {
+    marginBottom: 20,
   },
 });
