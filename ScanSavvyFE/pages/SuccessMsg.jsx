@@ -4,10 +4,14 @@ import {
     SafeAreaView,
     StyleSheet,
     ImageBackground,
+    TouchableOpacity,
 } from "react-native";
 import axios from "axios"; // Import axios for making HTTP requests
+import { useNavigation } from "@react-navigation/native";
 
 export default function SuccessMsg() {
+    const navigation = useNavigation();
+
     const [eventName, setEventName] = useState("");
     const [eventDateTime, setEventDateTime] = useState("");
 
@@ -29,6 +33,10 @@ export default function SuccessMsg() {
         fetchEventDetails(); // Call the function to fetch event details
     }, []); // Empty dependency array ensures the effect runs only once
 
+    const handleBackToHome = () => {
+        navigation.navigate('Home');
+    };
+
     return (
         <SafeAreaView style={{ flex: 1, padding: 2, marginTop: 10 }}>
             <ImageBackground
@@ -38,6 +46,9 @@ export default function SuccessMsg() {
             </ImageBackground>
             <Text style={styles.text}>You have been verified for {eventName}</Text>
             <Text style={styles.subtitle}>{eventDateTime}</Text>
+            <TouchableOpacity onPress={handleBackToHome} style={styles.button}>
+                <Text style={styles.buttonText}>Back to Home</Text>
+            </TouchableOpacity>
         </SafeAreaView>
     );
 }
@@ -61,5 +72,18 @@ const styles = StyleSheet.create({
         color: 'black',
         textAlign: 'center', 
         marginVertical: 10
-    }
+    },
+    button: {
+        backgroundColor: '#FF914D',
+        padding: 20,
+        borderRadius: 5,
+        marginTop: 20,
+        alignSelf: 'center',
+        paddingHorizontal: 60
+    },
+    buttonText: {
+        fontSize: 18,
+        color: 'white',
+        textAlign: 'center',
+    },
   });
