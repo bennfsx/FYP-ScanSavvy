@@ -391,16 +391,16 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingVertical: 20,
     paddingHorizontal: 30,
-    marginVertical: 10, 
-    marginHorizontal: 10, 
+    marginVertical: 10,
+    marginHorizontal: 10,
     textAlign: "center",
   },
   headerCell: {
     fontWeight: "bold",
     color: "#fff",
-    paddingVertical: 20, 
-    paddingHorizontal: 30, 
-    marginVertical: 10, 
+    paddingVertical: 20,
+    paddingHorizontal: 30,
+    marginVertical: 10,
     marginHorizontal: 10, // Added margin
   },
   actionsContainer: {
@@ -425,7 +425,7 @@ const styles = StyleSheet.create({
   editButton: {
     borderRadius: 4,
     padding: 10,
-    backgroundColor: 'green',
+    backgroundColor: "green",
     marginRight: 5,
   },
   deleteButton: {

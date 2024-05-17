@@ -43,4 +43,97 @@ const createVendor = async (req, res) => {
   }
 };
 
-module.exports = { createFavourites, createVendor, getVendor };
+const updateVendorByID = async (req, res) => {
+  try {
+    const { siteID } = req.params;
+    const { siteName, email, siteURL, phone, status } = req.body;
+
+    const updateFields = [];
+    const queryParams = [];
+
+    // Iterate over the fields in the request body
+    for (const [key, value] of Object.entries(req.body)) {
+      // Skip fields that are undefined or siteID
+      if (value === undefined || key === "siteID") {
+        continue;
+      }
+
+      // Add field to the updateFields array
+      updateFields.push(`${key} = ?`);
+
+      // Add corresponding value to the queryParams array
+      queryParams.push(value);
+    }
+
+    // Construct the SQL query
+    let query =
+      "UPDATE sites SET " + updateFields.join(", ") + " WHERE siteID = ?";
+    queryParams.push(siteID);
+
+    // Execute the SQL query with the provided siteID and vendor information
+    await pool.query(query, queryParams);
+
+    // Send success response
+    res.json({
+      status: "success",
+      message: "Vendor information updated successfully",
+    });
+  } catch (error) {
+    // Check if error is due to email uniqueness constraint violation
+    if (error.code === "ER_DUP_ENTRY") {
+      return res.status(400).json({
+        status: "error",
+        message: "Email already exists",
+      });
+    }
+
+    console.error("Error updating vendor by ID:", error);
+    res.status(500).json({
+      status: "error",
+      message: "Failed to update user information",
+    });
+  }
+};
+
+const deleteVendorByID = async (req, res) => {
+  try {
+    const { siteID } = req.params;
+
+    // Construct the SQL query to delete the user
+    const query = `
+      DELETE FROM sites 
+      WHERE siteID = ?
+    `;
+
+    // Execute the SQL query with the provided vendorID
+    const result = await pool.query(query, [siteID]);
+
+    // Check if the vendor with the specified ID was deleted
+    if (result.affectedRows === 0) {
+      return res.status(404).json({
+        status: "error",
+        message: "Vendor not found",
+      });
+    }
+
+    // Send the success response
+    res.json({
+      status: "success",
+      message: "Vendor deleted successfully",
+    });
+  } catch (error) {
+    console.error("Error deleting vendor by ID:", error);
+    res.status(500).json({
+      status: "error",
+      message: "Failed to delete vendor by ID",
+    });
+  }
+};
+
+module.exports = {
+  createFavourites,
+  createVendor,
+  getVendor,
+  updateVendorByID,
+  deleteVendorByID,
+};

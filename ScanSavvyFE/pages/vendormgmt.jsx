@@ -1,5 +1,4 @@
-import React, { useState } from "react";
-
+import React, { useState, useEffect } from "react";
 import {
   SafeAreaView,
   Text,
@@ -20,94 +19,89 @@ export default function VendorMgmt() {
   const [editId, setEditId] = useState(null);
   const [deleteId, setDeleteId] = useState(null);
   const [editVendor, setEditVendor] = useState(null);
+  const [newVendor, setNewVendor] = useState({
+    siteName: "",
+    siteURL: "",
+    email: "",
+    phone: "",
+  });
 
   // Data for the vendor table
   const [data, setData] = useState({
     tableHead: ["ID", "Name", "Email", "Website", "Phone", "Status", "Actions"],
-    tableData: [
-      {
-        id: 1,
-        name: "John Doe",
-        email: "john@example.com",
-        website: "www.example.com",
-        phone: "123-456-7890",
-        status: "Active",
-      },
-      {
-        id: 2,
-        name: "Jane Smith",
-        email: "jane@example.com",
-        website: "www.example.com",
-        phone: "123-456-7890",
-        status: "Inactive",
-      },
-      // Add more data as needed
-    ],
+    tableData: [],
   });
 
+  useEffect(() => {
+    fetchVendors();
+  }, []);
+
+  const fetchVendors = async () => {
+    try {
+      const response = await axiosAPI.post("/admin/getvendor");
+      setData((prevData) => ({
+        ...prevData,
+        tableData: response.data,
+      }));
+    } catch (error) {
+      console.error("Error fetching vendors:", error);
+    }
+  };
+
   const handleAddVendor = () => {
-    // Add new vendor logic
-    console.log("Add Vendor clicked");
     setIsModalVisible(true);
   };
 
-  const handleSaveVendor = () => {
-    // Save new vendor logic
-    console.log("Save Vendor clicked");
-    setIsModalVisible(false);
-    // Clear input fields
-    setNewVendor({
-      id: "",
-      name: "",
-      email: "",
-      website: "",
-      phone: "",
-      status: "",
-    });
+  const handleSaveVendor = async () => {
+    try {
+      await axiosAPI.put("/admin/createvendor", newVendor);
+      fetchVendors();
+      setIsModalVisible(false);
+      setNewVendor({
+        siteName: "",
+        siteURL: "",
+        email: "",
+        phone: "",
+      });
+    } catch (error) {
+      console.error("Error saving vendor:", error);
+    }
   };
 
   const handleEdit = (id) => {
-    // Find the vendor data by id
-    const vendor = data.tableData.find((vendor) => vendor.id === id);
-    // Set editVendor state to the found vendor data
+    const vendor = data.tableData.find((vendor) => vendor.siteID === id);
     setEditVendor(vendor);
-    // Set editId state to the id of the vendor being edited
     setEditId(id);
-    // Show the edit modal
     setIsEditModalVisible(true);
   };
 
-  const confirmEdit = () => {
-    // Update the vendor data with the edited values
-    setData({
-      ...data,
-      tableData: data.tableData.map((vendor) => {
-        if (vendor.id === editId) {
-          return editVendor; // Replace the vendor with the edited data
-        }
-        return vendor;
-      }),
-    });
-    // Hide the edit modal
-    setIsEditModalVisible(false);
+  const confirmEdit = async () => {
+    try {
+      await axiosAPI.patch(`/admin/updatevendorbyid/${editId}`, editVendor);
+      fetchVendors();
+      setIsEditModalVisible(false);
+    } catch (error) {
+      console.error("Error updating vendor:", error);
+    }
   };
 
   const handleDelete = (id) => {
-    // Handle delete action here
-    console.log(`Delete action clicked for ID: ${id}`);
     setDeleteId(id);
     setIsDeleteModalVisible(true);
   };
 
-  const confirmDelete = () => {
-    // Logic to delete the item with deleteId
-    console.log(`Deleting item with ID: ${deleteId}`);
-    setIsDeleteModalVisible(false);
+  const confirmDelete = async () => {
+    try {
+      await axiosAPI.delete(`/admin/deletevendorbyid/${deleteId}`);
+      fetchVendors();
+      setIsDeleteModalVisible(false);
+    } catch (error) {
+      console.error("Error deleting vendor:", error);
+    }
   };
 
   return (
     <SafeAreaView style={{ background: "#e8ecf4", paddingHorizontal: 20 }}>
-      {/* Data Table */}
       <ScrollView horizontal={true}>
         <View style={styles.container}>
           <Text style={styles.title}>Vendors</Text>
@@ -120,21 +114,21 @@ export default function VendorMgmt() {
           </View>
           {data.tableData.map((rowData, index) => (
             <View key={index} style={styles.row}>
-              <Text style={styles.cell}>{rowData.id}</Text>
-              <Text style={styles.cell}>{rowData.name}</Text>
+              <Text style={styles.cell}>{rowData.siteID}</Text>
+              <Text style={styles.cell}>{rowData.siteName}</Text>
               <Text style={styles.cell}>{rowData.email}</Text>
-              <Text style={styles.cell}>{rowData.website}</Text>
+              <Text style={styles.cell}>{rowData.siteURL}</Text>
               <Text style={styles.cell}>{rowData.phone}</Text>
               <Text style={styles.cell}>{rowData.status}</Text>
               <View style={styles.actions}>
                 <TouchableOpacity
-                  onPress={() => handleEdit(rowData.id)}
+                  onPress={() => handleEdit(rowData.siteID)}
                   style={[styles.button, styles.editButton]}
                 >
                   <Text style={styles.buttonText}>Edit</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
-                  onPress={() => handleDelete(rowData.id)}
+                  onPress={() => handleDelete(rowData.siteID)}
                   style={[styles.button, styles.deleteButton]}
                 >
                   <Text style={styles.buttonText}>Delete</Text>
@@ -144,7 +138,6 @@ export default function VendorMgmt() {
           ))}
         </View>
       </ScrollView>
-      {/* Add Vendor Button */}
       <TouchableOpacity onPress={handleAddVendor} style={styles.addButton}>
         <Text style={styles.addButtonText}>Add Vendor</Text>
       </TouchableOpacity>
@@ -160,13 +153,15 @@ export default function VendorMgmt() {
             <TextInput
               style={styles.input}
               placeholder="Name"
+              value={newVendor.siteName}
               onChangeText={(text) =>
-                setNewVendor({ ...newVendor, name: text })
+                setNewVendor({ ...newVendor, siteName: text })
               }
             />
             <TextInput
               style={styles.input}
               placeholder="Email"
+              value={newVendor.email}
               onChangeText={(text) =>
                 setNewVendor({ ...newVendor, email: text })
               }
@@ -174,13 +169,15 @@ export default function VendorMgmt() {
             <TextInput
               style={styles.input}
               placeholder="Website"
+              value={newVendor.siteURL}
               onChangeText={(text) =>
-                setNewVendor({ ...newVendor, website: text })
+                setNewVendor({ ...newVendor, siteURL: text })
               }
             />
             <TextInput
               style={styles.input}
               placeholder="Phone"
+              value={newVendor.phone}
               onChangeText={(text) =>
                 setNewVendor({ ...newVendor, phone: text })
               }
@@ -189,7 +186,6 @@ export default function VendorMgmt() {
           </View>
         </View>
       </Modal>
-      {/* Delete Vendor */}
       <Modal
         visible={isDeleteModalVisible}
         animationType="slide"
@@ -219,23 +215,21 @@ export default function VendorMgmt() {
           </View>
         </View>
       </Modal>
-      {/* Edit Vendor */}
       <Modal
         visible={isEditModalVisible}
         animationType="slide"
         transparent={true}
         onRequestClose={() => setIsEditModalVisible(false)}
       >
-        {/* Edit Vendor Modal Content */}
         <View style={styles.modal}>
           <View style={styles.modalContent}>
             <Text style={styles.modalTitle}>Edit Vendor</Text>
             <TextInput
               style={styles.input}
               placeholder="Name"
-              value={editVendor ? editVendor.name : ""}
+              value={editVendor ? editVendor.siteName : ""}
               onChangeText={(text) =>
-                setEditVendor({ ...editVendor, name: text })
+                setEditVendor({ ...editVendor, siteName: text })
               }
             />
             <TextInput
@@ -249,9 +243,9 @@ export default function VendorMgmt() {
             <TextInput
               style={styles.input}
               placeholder="Website"
-              value={editVendor ? editVendor.website : ""}
+              value={editVendor ? editVendor.siteURL : ""}
               onChangeText={(text) =>
-                setEditVendor({ ...editVendor, website: text })
+                setEditVendor({ ...editVendor, siteURL: text })
               }
             />
             <TextInput
