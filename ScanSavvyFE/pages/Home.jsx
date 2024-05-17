@@ -59,8 +59,27 @@ export default function Home() {
   };
 
   // Retrieve the count for vendors and users to display
-  const vendorCount = 5;
-  const userCount = 39;
+  const [vendorCount, setVendorCount] = useState('');
+  const [userCount, setUserCount] = useState('');
+
+  useEffect(() => {
+    const fetchCounts = async () => {
+      try {
+        // Fetch vendor count
+        const vendorResponse = await axiosAPI.post("/admin/vendorcount"); 
+        const fetchedVendorCount = vendorResponse.data.data.vendorCount;
+        setVendorCount(fetchedVendorCount);
+
+        // Fetch user count
+        const userResponse = await axiosAPI.post("/user/usercount"); 
+        const fetchedUserCount = userResponse.data.data.userCount;
+        setUserCount(fetchedUserCount);
+      } catch (error) {
+        console.error("Error fetching counts:", error);
+      }
+    };
+    fetchCounts();
+  }, []); 
 
   const logos = [
     { id: 1, source: require("../assets/image/scansavvyTrans.png") },
