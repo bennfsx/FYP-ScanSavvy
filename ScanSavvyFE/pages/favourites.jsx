@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   SafeAreaView,
   Text,
@@ -7,73 +7,88 @@ import {
   FlatList,
   TouchableOpacity,
   Image,
-  CheckBox,
   Modal,
+  Alert,
+  CheckBox,
 } from "react-native";
+// import CheckBox from "@react-native-community/checkbox"; // Import CheckBox from react-native-community
+import axiosAPI from "../axsioAPI";
 
-export default function Favourites() {
+export default function Favourites({ userID }) {
   const [modalVisible, setModalVisible] = useState(false);
+  const [data, setData] = useState([]);
 
-  const [data, setData] = useState([
-    {
-      id: 1,
-      label: "ScanSavvy",
-      image: require("../assets/image/scansavvyTrans.png"),
-      checked: false,
-    },
-    {
-      id: 2,
-      label: "ScanSavvy",
-      image: require("../assets/image/scansavvyTrans.png"),
-      checked: false,
-    },
-    {
-      id: 3,
-      label: "ScanSavvy",
-      image: require("../assets/image/scansavvyTrans.png"),
-      checked: false,
-    },
-    {
-      id: 4,
-      label: "ScanSavvy",
-      image: require("../assets/image/scansavvyTrans.png"),
-      checked: false,
-    },
-    {
-      id: 5,
-      label: "ScanSavvy",
-      image: require("../assets/image/scansavvyTrans.png"),
-      checked: false,
-    },
-    {
-      id: 6,
-      label: "ScanSavvy",
-      image: require("../assets/image/scansavvyTrans.png"),
-      checked: false,
-    },
-    {
-      id: 7,
-      label: "ScanSavvy",
-      image: require("../assets/image/scansavvyTrans.png"),
-      checked: false,
-    },
-  ]);
+  useEffect(() => {
+    // Fetch all vendors from the API
+    const fetchVendors = async () => {
+      try {
+        const response = await axiosAPI.post(`/admin/getvendor`);
+        console.log("Response data:", response.data); // Check the response data
+
+        // Ensure that response.data is defined and it's an array
+        if (
+          response.data &&
+          Array.isArray(response.data) &&
+          response.data.length > 0
+        ) {
+          const vendors = response.data.map((item) => ({
+            id: item.siteID,
+            label: item.siteName,
+            image: { uri: item.logo },
+            checked: false,
+          }));
+          setData(vendors);
+        } else {
+          console.error("Error: Invalid response data format");
+          Alert.alert("Error", "Failed to load vendors. Please try again.");
+        }
+      } catch (error) {
+        console.error("Error fetching vendors:", error);
+        Alert.alert("Error", "Failed to load vendors. Please try again.");
+      }
+    };
+
+    fetchVendors();
+  }, []);
+
   const toggleCheckbox = (id) => {
-    setData(
-      data.map((item) =>
-        item.id === id ? { ...item, checked: !item.checked } : item
-      )
+    const updatedData = data.map((item) =>
+      item.id === id ? { ...item, checked: !item.checked } : item
     );
+    const checkedCount = updatedData.filter((item) => item.checked).length;
+    if (checkedCount <= 3) {
+      setData(updatedData);
+    } else {
+      Alert.alert("Error", "You can only select up to 3 favorites.");
+    }
+  };
+
+  const handleSaveFavorites = async () => {
+    const selectedFavorites = data.filter((item) => item.checked);
+    if (selectedFavorites.length === 0) {
+      Alert.alert("Error", "Please select at least one favorite.");
+      return;
+    }
+
+    try {
+      await Promise.all(
+        selectedFavorites.map((favorite) =>
+          axiosAPI.put(`/home/createuserfav/${userID}`, {
+            siteID: favorite.id,
+          })
+        )
+      );
+      setModalVisible(true);
+    } catch (error) {
+      console.error("Error saving favorites:", error);
+      Alert.alert("Error", "Failed to save favorites. Please try again.");
+    }
   };
 
   const renderItem = ({ item }) => (
     <View>
       <TouchableOpacity
-        style={{
-          flexDirection: "row",
-          alignItems: "center",
-          marginVertical: 5,
-        }}
+        style={styles.itemContainer}
         onPress={() => toggleCheckbox(item.id)}
       >
         <Image source={item.image} style={styles.image} />
@@ -88,37 +103,31 @@ export default function Favourites() {
   );
 
   return (
-    <SafeAreaView
-      style={{ flex: 1, background: "#e8ecf4", paddingHorizontal: 20 }}
-    >
+    <SafeAreaView style={styles.safeAreaView}>
       <View style={styles.container}>
         <Text style={styles.title}>Edit Favourites</Text>
       </View>
       <Text style={styles.subtitle}>
         Select up to 3 shortcuts to access quickly on your homepage.
       </Text>
-      <View style={{ padding: 20 }}>
+      <View style={styles.listContainer}>
         <FlatList
           data={data}
           renderItem={renderItem}
           keyExtractor={(item) => item.id.toString()}
         />
-        {/* Save Button */}
         <TouchableOpacity
           style={styles.saveButton}
-          onPress={() => setModalVisible(true)}
+          onPress={handleSaveFavorites}
         >
           <Text style={styles.buttonText}>Save</Text>
         </TouchableOpacity>
       </View>
-      {/* Modal */}
       <Modal
         animationType="slide"
         transparent={true}
         visible={modalVisible}
-        onRequestClose={() => {
-          setModalVisible(!modalVisible);
-        }}
+        onRequestClose={() => setModalVisible(!modalVisible)}
       >
         <View style={styles.centeredView}>
           <View style={styles.modalView}>
@@ -139,10 +148,14 @@ export default function Favourites() {
 }
 
 const styles = StyleSheet.create({
+  safeAreaView: {
+    flex: 1,
+    backgroundColor: "#e8ecf4",
+    paddingHorizontal: 20,
+  },
   container: {
     marginHorizontal: 12,
     flexDirection: "row",
-    // justifyContent: "center"
   },
   title: {
     fontSize: 30,
@@ -154,9 +167,17 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     fontSize: 14,
-    fontWeight: 300,
+    fontWeight: "300",
     paddingHorizontal: 10,
     marginHorizontal: 12,
+  },
+  listContainer: {
+    padding: 20,
+  },
+  itemContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginVertical: 5,
   },
   image: {
     width: 130,
@@ -166,18 +187,16 @@ const styles = StyleSheet.create({
   line: {
     borderBottomColor: "#ccc",
     borderBottomWidth: 1,
-    width: "100%", // Adjust width as needed
+    width: "100%",
     marginBottom: 8,
   },
   saveButton: {
-    // marginTop: 10,
     backgroundColor: "#000",
     borderRadius: 8,
     paddingVertical: 14,
     alignItems: "center",
   },
   buttonText: {
-    // fontSize: 16,
     fontWeight: "500",
     color: "#fff",
   },

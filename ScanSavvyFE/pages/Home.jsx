@@ -1,4 +1,4 @@
-import { React, useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   SafeAreaView,
   View,
@@ -15,16 +15,11 @@ import axiosAPI from "../axsioAPI";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 
 export default function Home() {
-  const { logout, user, checkSession } = useUser(); // Provide a default value for user
+  const { logout, user, checkSession } = useUser();
   const [userProfile, setUserProfile] = useState("");
   const [loading, setLoading] = useState(true);
-
-  const [formData, setFormData] = useState({
-    firstName: "",
-    lastName: "",
-    email: "",
-    mobile: "",
-  });
+  const [vendors, setVendors] = useState([]);
+  const [formData, setFormData] = useState([]);
 
   const fetchUserProfile = async () => {
     try {
@@ -37,87 +32,67 @@ export default function Home() {
         mobile: response.data.data.mobile,
       });
       setLoading(false);
-      console.log(response);
     } catch (error) {
       console.error("Error fetching user profile:", error);
       setLoading(false);
     }
   };
 
+  const fetchVendors = async () => {
+    try {
+      const response = await axiosAPI.post("/admin/getvendor");
+      setVendors(response.data.slice(0, 6)); // Get only the first 6 vendors
+    } catch (error) {
+      console.error("Error fetching vendors:", error);
+    }
+  };
+
   useEffect(() => {
     fetchUserProfile();
+    fetchVendors();
     checkSession();
   }, []);
+
   const navigation = useNavigation();
 
   const handleScanPress = () => {
-    navigation.navigate("QRscanner"); // Navigate to the QRscanner screen
+    navigation.navigate("QRscanner");
   };
 
   const handleAccountPress = () => {
-    navigation.navigate("Account"); // Navigate to My Account screen
+    navigation.navigate("Account");
   };
 
-  // Retrieve the count for vendors and users to display
-  const vendorCount = 5;
-  const userCount = 39;
-
-  const logos = [
-    { id: 1, source: require("../assets/image/scansavvyTrans.png") },
-    { id: 2, source: require("../assets/image/scansavvyTrans.png") },
-    { id: 3, source: require("../assets/image/scansavvyTrans.png") },
-    { id: 4, source: require("../assets/image/scansavvyTrans.png") },
-    { id: 5, source: require("../assets/image/scansavvyTrans.png") },
-    { id: 6, source: require("../assets/image/scansavvyTrans.png") },
-  ];
+  const handleLogout = () => {
+    logout();
+    navigation.navigate("Login");
+  };
 
   // Function to render each row of logos
   const renderRow = ({ item }) => (
     <View style={styles.row}>
-      {item.map((logo) => (
-        <View key={logo.id} style={styles.logoContainer}>
-          <Image source={logo.source} style={styles.logo} />
+      {item.map((vendor) => (
+        <View key={vendor.siteID} style={styles.logoContainer}>
+          <Image source={{ uri: vendor.logo }} style={styles.logo} />
         </View>
       ))}
     </View>
   );
 
-  // Convert logos array into array of arrays with 3 logos each
+  // Convert vendors array into array of arrays with 3 logos each
   const rows = [];
-  for (let i = 0; i < logos.length; i += 3) {
-    rows.push(logos.slice(i, i + 3));
+  for (let i = 0; i < vendors.length; i += 3) {
+    rows.push(vendors.slice(i, i + 3));
   }
-
-  const favrows = [];
-  for (let i = 0; i < Math.min(logos.length, 3); i += 3) {
-    favrows.push(logos.slice(i, i + 3));
-  }
-
-  const handleLogout = () => {
-    logout();
-    navigation.navigate("Login");
-    console.log("logout");
-  };
 
   if (user.userType === "user") {
     return (
       <SafeAreaView style={{ flex: 1 }}>
-        {/* Your main content */}
         <View style={{ flex: 1 }}>
+          <Text style={styles.welcomeText}>Welcome</Text>
           <Text
-            style={{
-              fontSize: 36,
-              fontWeight: "500",
-              paddingHorizontal: 20,
-              marginTop: 10,
-            }}
-          >
-            Welcome
-          </Text>
-          <Text style={{ fontSize: 30, paddingHorizontal: 20 }}>
-            {`${formData.firstName} ${formData.lastName}!`}
-          </Text>
-          {/* Grey box in the middle */}
+            style={styles.userNameText}
+          >{`${formData.firstName} ${formData.lastName}!`}</Text>
           <View style={styles.greybox}>
             <View style={styles.headerContainer}>
               <Text style={styles.content}>Featured Websites</Text>
@@ -143,7 +118,7 @@ export default function Home() {
           </View>
           <View style={styles.container}>
             <FlatList
-              data={favrows}
+              data={rows}
               keyExtractor={(item, index) => index.toString()}
               renderItem={renderRow}
             />
@@ -153,38 +128,24 @@ export default function Home() {
           </View>
           <View style={styles.container}>
             <FlatList
-              data={favrows}
+              data={rows}
               keyExtractor={(item, index) => index.toString()}
               renderItem={renderRow}
             />
           </View>
         </View>
-
-        {/* Footer */}
         <Footer
           onScanPress={handleScanPress}
           onAccountPress={handleAccountPress}
         />
       </SafeAreaView>
     );
-  } else if (user.userType == "admin") {
+  } else if (user.userType === "admin") {
     return (
       <SafeAreaView style={{ flex: 1 }}>
-        {/* Your main content */}
         <View style={{ flex: 1 }}>
-          <Text
-            style={{
-              fontSize: 36,
-              fontWeight: "500",
-              paddingHorizontal: 20,
-              marginTop: 10,
-            }}
-          >
-            Welcome
-          </Text>
-          <Text style={{ fontSize: 30, paddingHorizontal: 20 }}>
-            {`${formData.firstName}!`}
-          </Text>
+          <Text style={styles.welcomeText}>Welcome</Text>
+          <Text style={styles.userNameText}>{`${formData.firstName}!`}</Text>
           <View style={styles.container2}>
             <View style={styles.boxVendor}>
               <Text style={styles.boxText}>Vendors</Text>
@@ -215,7 +176,6 @@ export default function Home() {
               </TouchableOpacity>
             </View>
           </View>
-          {/* Logout button */}
           <View style={{ paddingHorizontal: 20, paddingVertical: 50 }}>
             <TouchableOpacity onPress={handleLogout}>
               <View style={styles.btn}>
@@ -230,6 +190,16 @@ export default function Home() {
 }
 
 const styles = StyleSheet.create({
+  welcomeText: {
+    fontSize: 36,
+    fontWeight: "500",
+    paddingHorizontal: 20,
+    marginTop: 10,
+  },
+  userNameText: {
+    fontSize: 30,
+    paddingHorizontal: 20,
+  },
   greybox: {
     backgroundColor: "#e8ecf4",
     height: 300,
@@ -244,14 +214,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   row: {
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
-    marginBottom: 10,
-    padding: "5px",
-    margin: "5px",
-  },
-  favrows: {
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",

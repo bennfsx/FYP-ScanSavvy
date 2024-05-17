@@ -55,7 +55,7 @@ const getUserFavoritesByUserID = async (req, res) => {
   try {
     const { userID } = req.params;
     const favorites = await pool.query(
-      "SELECT s.siteID, s.siteName, s.siteDesc, s.siteURL, s.email, s.phone, s.status FROM favorites f JOIN sites s ON f.siteID = s.siteID WHERE f.userID = ?",
+      "SELECT s.siteID, s.siteName, s.siteDesc, s.siteURL, s.email, s.phone, s.status, s.logo FROM favorites f JOIN sites s ON f.siteID = s.siteID WHERE f.userID = ?",
       [userID]
     );
     res.json({ favorites });
