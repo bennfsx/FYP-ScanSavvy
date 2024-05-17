@@ -15,7 +15,7 @@ import axiosAPI from "../axsioAPI";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 
 export default function Home() {
-  const { user, checkSession } = useUser(); // Provide a default value for user
+  const { logout, user, checkSession } = useUser(); // Provide a default value for user
   const [userProfile, setUserProfile] = useState("");
   const [loading, setLoading] = useState(true);
 
@@ -92,6 +92,13 @@ export default function Home() {
   for (let i = 0; i < Math.min(logos.length, 3); i += 3) {
     favrows.push(logos.slice(i, i + 3));
   }
+
+  const handleLogout = () => {
+    logout();
+    navigation.navigate("Login");
+    console.log("logout");
+  };
+
   if (user.userType === "user") {
     return (
       <SafeAreaView style={{ flex: 1 }}>
@@ -194,6 +201,14 @@ export default function Home() {
             </TouchableOpacity>
           </View>
         </View>
+        {/* Logout button */}
+        <View style={{ paddingHorizontal: 20, paddingVertical: 50 }}>
+            <TouchableOpacity onPress={handleLogout}>
+              <View style={styles.btn}>
+                <Text style={styles.btnText}>Log Out</Text>
+              </View>
+            </TouchableOpacity>
+          </View>
         </View>
       </SafeAreaView>
     )
@@ -271,7 +286,7 @@ const styles = StyleSheet.create({
   boxUser: {
     width: '45%',
     height: 130,
-    backgroundColor: '#000000',
+    backgroundColor: '#FF914D',
     borderRadius: 20,
     justifyContent: 'flex-start',
     alignItems: 'flex-start',
@@ -296,5 +311,22 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 10,
     right: 10,
+  },
+  btn: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    borderRadius: 8,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderWidth: 1,
+    backgroundColor: "#000",
+    borderColor: "#000",
+  },
+  btnText: {
+    fontSize: 18,
+    lineHeight: 26,
+    fontWeight: "600",
+    color: "#fff",
   },
 });
