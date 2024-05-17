@@ -17,10 +17,40 @@ const getVendor = async (req, res) => {
   }
 };
 
+const countVendor = async (req, res) => {
+  try {
+    const query = `
+      SELECT COUNT(*) AS vendorCount
+      FROM sites
+      WHERE status = 'active'
+    `;
+
+    // Execute the SQL query
+    const result = await pool.query(query);
+
+    // Extract the count from the query result
+    const vendorCount = result[0].vendorCount;
+
+    // Send the user count in the response
+    res.json({
+      status: "success",
+      data: {
+        vendorCount: vendorCount,
+      },
+    });
+  } catch (error) {
+    console.error("Error counting vendor by status:", error);
+    res.status(500).json({
+      status: "error",
+      message: "Failed to count vendor by status",
+    });
+  }
+};
+
 const createVendor = async (req, res) => {
   try {
     const { siteName, siteURL, email, phone } = req.body; // Assuming these fields are sent in the request body
-
+    const { status } = "active";
     // Validate if required fields are present
     if (!siteName || !siteURL || !email || !phone) {
       return res.status(400).json({ error: "Missing required fields" });
@@ -28,12 +58,12 @@ const createVendor = async (req, res) => {
 
     // Assuming you have a SQL query to insert a new vendor into the database
     const query = `
-            INSERT INTO sites (siteName, siteURL, email, phone)
-            VALUES (?, ?, ?, ?)
+            INSERT INTO sites (siteName, siteURL, email, phone, status, logo)
+            VALUES (?, ?, ?, ?, 'active', 'https://storage.googleapis.com/eventstack_bucket/scansavvyTrans.png')
         `;
 
     // Execute the query with the provided parameters
-    await pool.query(query, [siteName, siteURL, email, phone]);
+    await pool.query(query, [siteName, siteURL, email, phone, status]);
 
     // Respond with success
     res.status(201).json({ message: "Vendor created successfully" });
@@ -136,4 +166,5 @@ module.exports = {
   getVendor,
   updateVendorByID,
   deleteVendorByID,
+  countVendor,
 };

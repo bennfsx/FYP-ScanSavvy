@@ -8,6 +8,8 @@ import {
   Image,
 } from "react-native";
 
+import axiosAPI from "../axsioAPI";
+
 export default function FeaturedWebs() {
   const logos = [
     { id: 1, source: require("../assets/image/scansavvyTrans.png") },

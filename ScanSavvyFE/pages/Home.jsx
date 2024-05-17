@@ -122,7 +122,7 @@ export default function Home() {
             <View style={styles.headerContainer}>
               <Text style={styles.content}>Featured Websites</Text>
               <TouchableOpacity
-                onPress={() => navigation.navigate("SuccessMsg")}
+                onPress={() => navigation.navigate("FeaturedWebs")}
               >
                 <Text style={styles.viewallContent}>View All</Text>
               </TouchableOpacity>
@@ -186,23 +186,37 @@ export default function Home() {
             {`${formData.firstName}!`}
           </Text>
           <View style={styles.container2}>
-          <View style={styles.boxVendor}>
-            <Text style={styles.boxText}>Vendors</Text>
-            <Text style={styles.countText}>{vendorCount}</Text>
-            <TouchableOpacity style={styles.arrow} onPress={() => navigation.navigate("VendorMgmt")}>
-              <MaterialCommunityIcons name="arrow-right" size={24} color="white" />
-            </TouchableOpacity>
+            <View style={styles.boxVendor}>
+              <Text style={styles.boxText}>Vendors</Text>
+              <Text style={styles.countText}>{vendorCount}</Text>
+              <TouchableOpacity
+                style={styles.arrow}
+                onPress={() => navigation.navigate("VendorMgmt")}
+              >
+                <MaterialCommunityIcons
+                  name="arrow-right"
+                  size={24}
+                  color="white"
+                />
+              </TouchableOpacity>
+            </View>
+            <View style={styles.boxUser}>
+              <Text style={styles.boxText}>Active Users</Text>
+              <Text style={styles.countText}>{userCount}</Text>
+              <TouchableOpacity
+                style={styles.arrow}
+                onPress={() => navigation.navigate("UserMgmt")}
+              >
+                <MaterialCommunityIcons
+                  name="arrow-right"
+                  size={24}
+                  color="white"
+                />
+              </TouchableOpacity>
+            </View>
           </View>
-          <View style={styles.boxUser}>
-            <Text style={styles.boxText}>Active Users</Text>
-            <Text style={styles.countText}>{userCount}</Text>
-            <TouchableOpacity style={styles.arrow} onPress={() => navigation.navigate("UserMgmt")}>
-              <MaterialCommunityIcons name="arrow-right" size={24} color="white" />
-            </TouchableOpacity>
-          </View>
-        </View>
-        {/* Logout button */}
-        <View style={{ paddingHorizontal: 20, paddingVertical: 50 }}>
+          {/* Logout button */}
+          <View style={{ paddingHorizontal: 20, paddingVertical: 50 }}>
             <TouchableOpacity onPress={handleLogout}>
               <View style={styles.btn}>
                 <Text style={styles.btnText}>Log Out</Text>
@@ -211,7 +225,7 @@ export default function Home() {
           </View>
         </View>
       </SafeAreaView>
-    )
+    );
   }
 }
 
@@ -267,48 +281,48 @@ const styles = StyleSheet.create({
     color: "#FF914D",
   },
   container2: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    justifyContent: "space-between",
     paddingHorizontal: 20,
     paddingTop: 50,
   },
   boxVendor: {
-    width: '45%',
+    width: "45%",
     height: 130,
-    backgroundColor: '#0070F4',
+    backgroundColor: "#0070F4",
     borderRadius: 20,
-    justifyContent: 'flex-start',
-    alignItems: 'flex-start',
+    justifyContent: "flex-start",
+    alignItems: "flex-start",
     padding: 10,
-    position: 'relative',
+    position: "relative",
     elevation: 20,
   },
   boxUser: {
-    width: '45%',
+    width: "45%",
     height: 130,
-    backgroundColor: '#FF914D',
+    backgroundColor: "#FF914D",
     borderRadius: 20,
-    justifyContent: 'flex-start',
-    alignItems: 'flex-start',
+    justifyContent: "flex-start",
+    alignItems: "flex-start",
     padding: 10,
-    position: 'relative',
+    position: "relative",
     elevation: 5,
   },
   boxText: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 22,
-    fontWeight: 'bold',
-    alignSelf: 'flex-start',
+    fontWeight: "bold",
+    alignSelf: "flex-start",
   },
   countText: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 40,
-    alignSelf: 'flex-start',
+    alignSelf: "flex-start",
     marginTop: 5,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   arrow: {
-    position: 'absolute',
+    position: "absolute",
     top: 10,
     right: 10,
   },

@@ -6,11 +6,13 @@ const {
   getVendor,
   updateVendorByID,
   deleteVendorByID,
-} = require("../controllers/objController");
+  countVendor,
+} = require("../controllers/adminController");
 
 router.put("/createvendor", createVendor);
 router.post("/getvendor", getVendor);
 router.patch("/updatevendorbyid/:siteID", updateVendorByID);
 router.delete("/deletevendorbyid/:siteID", deleteVendorByID);
+router.post("/vendorcount", countVendor);
 
 module.exports = router;
