@@ -8,11 +8,14 @@ import {
   Alert,
 } from "react-native";
 import { Camera } from "expo-camera";
+import { useUser } from "../hooks/useUser";
+import axiosAPI from "../axsioAPI";
 
 export default function QRscanner() {
   const [hasPermission, setHasPermission] = useState(null);
   const [scanned, setScanned] = useState(false);
   const [scannedData, setScannedData] = useState(null);
+  const { user } = useUser();
 
   useEffect(() => {
     (async () => {
@@ -24,6 +27,27 @@ export default function QRscanner() {
   const handleBarCodeScanned = ({ type, data }) => {
     setScanned(true);
     setScannedData(data);
+    console.log(data);
+    axiosAPI
+      .post(
+        "https://asia-southeast1-qrfyp2024.cloudfunctions.net/fyp-api/scancode",
+        {
+          codeHash: data,
+          userID: user.userID,
+        }
+      )
+      .then(function (response) {
+        if (response.status == 200) {
+          console.log("Ok");
+        } else if (response.status == 409) {
+          console.log("Code already has been scanned");
+        } else if (response.status == 410) {
+          console.log("Code has been expired");
+        }
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
   };
 
   const handleRedirectConfirmation = () => {

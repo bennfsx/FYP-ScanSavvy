@@ -70,13 +70,15 @@ export default function Login() {
         }
       } else {
         // Handle non-200 response status
-        console.error("Invalid response status:", response.status);
+        console.error("Invalid response status:", response);
+        // alert(response);
         alert("Error logging in. Please try again later.");
       }
     } catch (error) {
       // Handle network errors or other issues
       console.error("Error logging in:", error.message);
-      alert("Error logging in. Please try again later.");
+      alert(error);
+      // alert("Error logging in. Please try again later.");
     }
   };
 

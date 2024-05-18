@@ -121,7 +121,7 @@ const styles = StyleSheet.create({
     borderBottomColor: "#ccc",
     borderBottomWidth: 1,
     width: "100%", // Adjust width as needed
-    marginBottom: 8
+    marginBottom: 8,
   },
   btn: {
     flexDirection: "row",

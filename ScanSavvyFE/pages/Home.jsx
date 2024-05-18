@@ -25,7 +25,7 @@ export default function Home() {
 
   const fetchUserProfile = async () => {
     try {
-      const response = await axiosAPI.get(`user/getuserbyid/${user.userID}`);
+      const response = await axiosAPI.get(`/user/getuserbyid/${user.userID}`);
       setUserProfile(response.data.data);
       setFormData({
         firstName: response.data.data.firstName,
