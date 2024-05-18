@@ -26,27 +26,32 @@ const userHistory = async (req, res) => {
 const createUserFavorites = async (req, res) => {
   try {
     const { userID } = req.params;
-    const { siteID } = req.body;
+    const { siteIDs } = req.body; // Expecting an array of siteIDs
 
-    // Check if the user already has the site in favorites
-    const existingFavorite = await pool.query(
-      "SELECT * FROM favorites WHERE userID = ? AND siteID = ?",
-      [userID, siteID]
+    // Begin a transaction
+    await pool.query("START TRANSACTION");
+
+    // Delete existing favorites for the user
+    await pool.query("DELETE FROM favorites WHERE userID = ?", [userID]);
+
+    // Insert new favorites
+    const insertPromises = siteIDs.map((siteID) =>
+      pool.query("INSERT INTO favorites (userID, siteID) VALUES (?, ?)", [
+        userID,
+        siteID,
+      ])
     );
 
-    if (existingFavorite.length > 0) {
-      return res.status(400).json({ error: "Site already in favorites" });
-    }
+    await Promise.all(insertPromises);
 
-    // Insert the new favorite into the favorites table
-    await pool.query("INSERT INTO favorites (userID, siteID) VALUES (?, ?)", [
-      userID,
-      siteID,
-    ]);
+    // Commit the transaction
+    await pool.query("COMMIT");
 
-    res.status(201).json({ message: "Site added to favorites successfully" });
+    res.status(201).json({ message: "Favorites updated successfully" });
   } catch (error) {
-    console.error("Error adding site to favorites:", error);
+    // Rollback transaction in case of error
+    await pool.query("ROLLBACK");
+    console.error("Error updating favorites:", error);
     res.status(500).json({ error: "Internal Server Error" });
   }
 };

@@ -13,10 +13,11 @@ import {
 } from "react-native";
 // import CheckBox from "@react-native-community/checkbox"; // Import CheckBox from react-native-community
 import axiosAPI from "../axsioAPI";
-
+import { useUser } from "../hooks/useUser";
 export default function Favourites({ userID }) {
   const [modalVisible, setModalVisible] = useState(false);
   const [data, setData] = useState([]);
+  const { user } = useUser();
 
   useEffect(() => {
     // Fetch all vendors from the API
@@ -71,13 +72,10 @@ export default function Favourites({ userID }) {
     }
 
     try {
-      await Promise.all(
-        selectedFavorites.map((favorite) =>
-          axiosAPI.put(`/home/createuserfav/${userID}`, {
-            siteID: favorite.id,
-          })
-        )
-      );
+      const siteIDs = selectedFavorites.map((favorite) => favorite.id);
+      await axiosAPI.put(`/home/createuserfav/${user.userID}`, {
+        siteIDs,
+      });
       setModalVisible(true);
     } catch (error) {
       console.error("Error saving favorites:", error);

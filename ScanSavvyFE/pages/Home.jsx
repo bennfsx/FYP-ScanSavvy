@@ -7,6 +7,7 @@ import {
   FlatList,
   Image,
   TouchableOpacity,
+  Linking,
 } from "react-native";
 import Footer from "../partials/Footer";
 import { useNavigation } from "@react-navigation/native";
@@ -16,10 +17,11 @@ import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityI
 
 export default function Home() {
   const { logout, user, checkSession } = useUser();
-  const [userProfile, setUserProfile] = useState("");
+  const [userProfile, setUserProfile] = useState({});
   const [loading, setLoading] = useState(true);
   const [vendors, setVendors] = useState([]);
-  const [formData, setFormData] = useState([]);
+  const [formData, setFormData] = useState({});
+  const [favorites, setFavorites] = useState([]);
 
   const fetchUserProfile = async () => {
     try {
@@ -38,6 +40,15 @@ export default function Home() {
     }
   };
 
+  const fetchFavourites = async () => {
+    try {
+      const response = await axiosAPI.post(`/home/getuserfav/${user.userID}`);
+      setFavorites(response.data.favorites);
+    } catch (error) {
+      console.error("Error fetching favourites:", error);
+    }
+  };
+
   const fetchVendors = async () => {
     try {
       const response = await axiosAPI.post("/admin/getvendor");
@@ -51,6 +62,7 @@ export default function Home() {
     fetchUserProfile();
     fetchVendors();
     checkSession();
+    fetchFavourites();
   }, []);
 
   const navigation = useNavigation();
@@ -67,6 +79,16 @@ export default function Home() {
     logout();
     navigation.navigate("Login");
   };
+
+  const handleLogoPress = (url) => {
+    // Check if the URL starts with "http://" or "https://"
+    if (!url.startsWith("http://") && !url.startsWith("https://")) {
+      // If not, add the "http://" prefix
+      url = "http://" + url;
+    }
+    Linking.openURL(url);
+  };
+
   // Retrieve the count for vendors and users to display
   const [vendorCount, setVendorCount] = useState("");
   const [userCount, setUserCount] = useState("");
@@ -90,24 +112,30 @@ export default function Home() {
     fetchCounts();
   }, []);
 
-  const logos = [
-    { id: 1, source: require("../assets/image/scansavvyTrans.png") },
-    { id: 2, source: require("../assets/image/scansavvyTrans.png") },
-    { id: 3, source: require("../assets/image/scansavvyTrans.png") },
-    { id: 4, source: require("../assets/image/scansavvyTrans.png") },
-    { id: 5, source: require("../assets/image/scansavvyTrans.png") },
-    { id: 6, source: require("../assets/image/scansavvyTrans.png") },
-  ];
-
   // Function to render each row of logos
   const renderRow = ({ item }) => (
     <View style={styles.row}>
       {item.map((vendor) => (
-        <View key={vendor.siteID} style={styles.logoContainer}>
-          <Image source={{ uri: vendor.logo }} style={styles.logo} />
-        </View>
+        <TouchableOpacity
+          key={vendor.siteID}
+          onPress={() => handleLogoPress(vendor.siteURL)}
+        >
+          <View style={styles.logoContainer}>
+            <Image source={{ uri: vendor.logo }} style={styles.logo} />
+          </View>
+        </TouchableOpacity>
       ))}
     </View>
+  );
+
+  // Function to render each favorite logo
+  const renderFavorite = ({ item }) => (
+    <TouchableOpacity
+      onPress={() => handleLogoPress(item.siteURL)}
+      style={styles.logoContainer}
+    >
+      <Image source={{ uri: item.logo }} style={styles.logo} />
+    </TouchableOpacity>
   );
 
   // Convert vendors array into array of arrays with 3 logos each
@@ -120,10 +148,10 @@ export default function Home() {
     return (
       <SafeAreaView style={{ flex: 1 }}>
         <View style={{ flex: 1 }}>
-          <Text style={styles.welcomeText}>Welcome</Text>
+          <Text style={styles.welcomeText}>Welcome!</Text>
           <Text
             style={styles.userNameText}
-          >{`${formData.firstName} ${formData.lastName}!`}</Text>
+          >{`${formData.firstName} ${formData.lastName}`}</Text>
           <View style={styles.greybox}>
             <View style={styles.headerContainer}>
               <Text style={styles.content}>Featured Websites</Text>
@@ -149,9 +177,10 @@ export default function Home() {
           </View>
           <View style={styles.container}>
             <FlatList
-              data={rows}
+              data={favorites}
               keyExtractor={(item, index) => index.toString()}
-              renderItem={renderRow}
+              renderItem={renderFavorite}
+              horizontal={true}
             />
           </View>
           <View style={styles.headerContainer}>
@@ -159,7 +188,7 @@ export default function Home() {
           </View>
           <View style={styles.container}>
             <FlatList
-              data={rows}
+              data={rows} // Assuming you want to show the same vendors for history, change this if needed
               keyExtractor={(item, index) => index.toString()}
               renderItem={renderRow}
             />
@@ -223,55 +252,64 @@ export default function Home() {
 const styles = StyleSheet.create({
   welcomeText: {
     fontSize: 36,
-    fontWeight: "500",
+    fontWeight: "bold",
     paddingHorizontal: 20,
-    marginTop: 10,
+    marginTop: 20,
+    marginBottom: 10,
+    color: "#333", // Dark gray color
   },
   userNameText: {
-    fontSize: 30,
+    fontSize: 24,
     paddingHorizontal: 20,
+    marginBottom: 20,
+    color: "#555", // Gray color
   },
   greybox: {
-    backgroundColor: "#e8ecf4",
-    height: 300,
+    backgroundColor: "#f5f5f5", // Light gray background
     marginTop: 20,
+    borderRadius: 15,
+    padding: 20,
   },
   content: {
     fontSize: 20,
     paddingHorizontal: 20,
     marginTop: 20,
+    fontWeight: "bold",
+    color: "#333", // Dark gray color
   },
   container: {
     justifyContent: "center",
+    paddingVertical: 10,
   },
   row: {
     flexDirection: "row",
-    justifyContent: "center",
+    justifyContent: "center", // Center align the logos
     alignItems: "center",
-    marginBottom: 10,
-    padding: "5px",
-    margin: "5px",
+    marginBottom: 20,
+    paddingHorizontal: 10,
   },
   logoContainer: {
-    flex: 3,
+    flex: 1,
+    alignItems: "center",
   },
   logo: {
-    width: 130,
-    height: 80,
-    margin: "10px",
+    width: 100,
+    height: 60,
     resizeMode: "contain",
   },
   headerContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    paddingHorizontal: 10,
-    marginBottom: 10,
+    paddingHorizontal: 20,
+    marginBottom: 20,
+    alignItems: "flex-start", // Align items to the start (left)
   },
   viewallContent: {
     fontSize: 16,
     marginTop: 20,
-    color: "#FF914D",
+    color: "#007bff", // Blue color
+    textDecorationLine: "underline",
   },
   container2: {
     flexDirection: "row",
@@ -282,37 +320,35 @@ const styles = StyleSheet.create({
   boxVendor: {
     width: "45%",
     height: 130,
-    backgroundColor: "#0070F4",
+    backgroundColor: "#0070F4", // Blue color
     borderRadius: 20,
-    justifyContent: "flex-start",
-    alignItems: "flex-start",
-    padding: 10,
-    position: "relative",
-    elevation: 20,
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 20,
+    elevation: 5,
   },
   boxUser: {
     width: "45%",
     height: 130,
-    backgroundColor: "#FF914D",
+    backgroundColor: "#FF914D", // Orange color
     borderRadius: 20,
-    justifyContent: "flex-start",
-    alignItems: "flex-start",
-    padding: 10,
-    position: "relative",
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 20,
     elevation: 5,
   },
   boxText: {
-    color: "#fff",
+    color: "#fff", // White color
     fontSize: 22,
     fontWeight: "bold",
-    alignSelf: "flex-start",
+    marginBottom: 10,
+    textAlign: "left", // Align text to the left
   },
   countText: {
-    color: "#fff",
+    color: "#fff", // White color
     fontSize: 40,
-    alignSelf: "flex-start",
-    marginTop: 5,
     fontWeight: "bold",
+    textAlign: "center", // Center align the text
   },
   arrow: {
     position: "absolute",
@@ -326,14 +362,11 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     paddingVertical: 10,
     paddingHorizontal: 20,
-    borderWidth: 1,
-    backgroundColor: "#000",
-    borderColor: "#000",
+    backgroundColor: "#007bff", // Blue color
   },
   btnText: {
     fontSize: 18,
-    lineHeight: 26,
     fontWeight: "600",
-    color: "#fff",
+    color: "#fff", // White color
   },
 });
